@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@source "../views";
+
+@tailwind utilities;
+
+@layer base {
+    ol {
+        list-style: decimal !important;
+        padding-left: 20px !important;
+    }
+    ul {
+        list-style: disc;
+        padding-left: 20px !important;
+    }
+    li {
+        display: list-item !important;
+    }
+}
+
+.btn-blue {
+    background-color: #3b82f6; /* Warna biru */
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+}
+
+.btn-blue:hover {
+    background-color: #2563eb; /* Warna biru lebih gelap saat hover */
+}
