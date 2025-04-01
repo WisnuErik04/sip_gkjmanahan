@@ -150,6 +150,22 @@ class VerifAgendaResource extends Resource
                     ->required()
                     ->reactive(), // Agar bisa mendeteksi perubahan langsung di form
 
+                Forms\Components\Section::make('Cetak Formulir')
+                    ->schema([
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('view_form')
+                                ->label('View Form')
+                                ->url(fn ($get) => Storage::url($get('form_file_path')))
+                                ->openUrlInNewTab(),
+    
+                            Forms\Components\Actions\Action::make('view_form')
+                                ->label('Download')
+                                ->color('success')
+                                ->url(fn ($get) => route('file.downloadForm', ['id' => $get('id')]))
+                                ->openUrlInNewTab(false),
+                        ]),
+                    ]),
+
                 Section::make('Dokumen yang Diupload')
                     ->schema(function (Forms\Get $get) {
                         $formId = $get('form_id');
