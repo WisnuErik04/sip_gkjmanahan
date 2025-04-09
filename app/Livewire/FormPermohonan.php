@@ -33,6 +33,108 @@ class FormPermohonan extends Component
     public $forms;
     protected $listeners = ['upload:progress' => 'updateProgress'];
 
+    public $step = 1;
+
+    public function nextStep()
+    {
+        $this->resetErrorBag(); // Reset error sebelum validasi
+
+        if ($this->step === 1) {
+            $this->validate([
+                'pemohon_nama' => 'required|string',
+                'pemohon_hp_telepon' => 'required|regex:/^0\d{9,14}$/',
+                'pemohon_email' => 'required|email',
+                'pemohon_warga_blok' => 'required|string',
+                'pemohon_alamat' => 'required|string',
+            ]);
+        }
+
+        if ($this->step === 2) {
+            $this->validate([
+                'form_id' => 'required|exists:forms,id',
+            ]);
+
+            // $pertanyaans = FormPertanyaan::where('form_id', $this->form_id)->orderBy('order')->get();
+            // $this->$pertanyaans = $pertanyaans;
+            // $listUploads = ListUploadForm::where('form_id', $this->form_id)->get();
+            // $this->$listUploads = $listUploads;
+            // foreach ($pertanyaans as $pertanyaan) {
+            //     if ($pertanyaan->required && $pertanyaan->tipe_jawaban !== 'header') {
+            //         $this->validate([
+            //             "answers.{$pertanyaan->order}" => 'required',
+            //         ]);
+            //     }
+            // }
+
+            // foreach ($listUploads as $upload) {
+            //     if ($upload->is_required) {
+            //         $this->validate([
+            //             "uploadedFiles.{$upload->id}" => 'required',
+            //         ]);
+            //     }
+            // }
+        }
+
+        if ($this->step === 3) {
+            $pertanyaans = FormPertanyaan::where('form_id', $this->form_id)->orderBy('order')->get();
+            // $this->$pertanyaans = $pertanyaans;
+            $messages = [];
+
+            foreach ($pertanyaans as $pertanyaan) {
+                if ($pertanyaan->tipe_jawaban !== 'header') {
+                    $fieldName = 'answers.' . $pertanyaan->order;
+
+                    if (!isset($this->answers[$pertanyaan->order])) {
+                        $this->answers[$pertanyaan->order] = null;
+                    }
+
+                    if ($pertanyaan->required) {
+                        $rules[$fieldName] = 'required';
+                        $messages[$fieldName . '.required'] = $pertanyaan->pertanyaan . ' harus diisi.';
+                    } else {
+                        $rules[$fieldName] = 'nullable';
+                        $messages[$fieldName . '.nullable'] = '';
+                    }
+                }
+            }
+            $this->validate($rules, $messages);
+        }
+
+        if ($this->step === 4) {
+            $listUploads = ListUploadForm::where('form_id', $this->form_id)->get();
+            // $this->$listUploads = $listUploads;
+            $messages = [];
+
+            foreach ($listUploads as $upload) {
+                $fieldName = 'uploadedFiles.' . $upload->id;
+
+                if ($upload->is_required) {
+                    $rules[$fieldName] = 'required|file|max:2048';
+                    $messages[$fieldName . '.required'] = $upload->name . ' wajib diunggah.';
+                } else {
+                    $rules[$fieldName] = 'nullable|file|max:2048';
+                }
+
+                // Tentukan jenis file yang diperbolehkan
+                if ($upload->upload_type == 'pdf') {
+                    $rules[$fieldName] .= '|mimes:pdf';
+                    $messages[$fieldName . '.mimes'] = $upload->name . ' harus berupa file PDF.';
+                } elseif ($upload->upload_type == 'image') {
+                    $rules[$fieldName] .= '|mimes:jpg,jpeg,png';
+                    $messages[$fieldName . '.mimes'] = $upload->name . ' harus berupa gambar (JPG, JPEG, PNG).';
+                }
+            }
+            $this->validate($rules, $messages);
+        }
+        $this->step++;
+    }
+
+
+    public function previousStep()
+    {
+        $this->step--;
+    }
+
     public function updateProgress($event, $percentage)
     {
         // dd($event);
@@ -52,7 +154,7 @@ class FormPermohonan extends Component
 
     public function mount($existingAnswers = [])
     {
-        $this->forms = Form::all(); // Ambil daftar form dari database
+        $this->forms = Form::select('id', 'name')->get(); // Ambil daftar form dari database
         $this->answers = $existingAnswers;
     }
 
@@ -214,7 +316,7 @@ class FormPermohonan extends Component
                 'status' => $status,
                 'notes' => $notes,
             ];
-            Mail::to($permohonan->pemohon_email)->send(new RequestStatusesMail($data));
+            // Mail::to($permohonan->pemohon_email)->send(new RequestStatusesMail($data));
 
             $fonnteService = new FonnteService();
             $message = "Detail Permohonan:\n";
@@ -222,8 +324,8 @@ class FormPermohonan extends Component
             $message .= "Warga Blok/Pepanthan: $permohonan->pemohon_warga_blok\n";
             $message .= "Jenis Permohonan: $JenisPermohonan\n";
             $message .= "Status: $status\n";
-            $message .= "Keterangan: ".$notes."\n";
-            $message .= "\nThanks,\nAdmin Sekretariat GKJ Manahan Surakarta";
+            $message .= "Keterangan: " . $notes . "\n";
+            $message .= "\nTerima kasih,\nAdmin Sekretariat GKJ Manahan Surakarta";
             $fonnteService->sendMessage($permohonan->pemohon_hp_telepon, $message);
 
             DB::commit(); // **Simpan Semua Perubahan Jika Berhasil**
@@ -234,6 +336,7 @@ class FormPermohonan extends Component
             // session()->flash('message', 'Permohonan berhasil disimpan!');
         } catch (\Exception $e) {
             DB::rollBack(); // **Rollback jika ada error**
+            // dd($e); // atau dd($e->getMessage());
             return redirect()->route('form.gagal');
             // session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -255,7 +358,7 @@ class FormPermohonan extends Component
         // **Buat PDF dari View**
         // $pdf = Pdf::loadView('pdf.form', $data);
         $formId = $request->form_id;
-        $pertanyaans = FormPertanyaan::where('form_id', $formId)->get();
+        $pertanyaans = FormPertanyaan::where('form_id', $formId)->orderBy('order')->get();
         if ($formId == '2') {
             $view = 'pdf.baptis_anak';
         } elseif ($formId == '3') {
@@ -267,12 +370,12 @@ class FormPermohonan extends Component
         } elseif ($formId == '6') {
             $view = 'pdf.attestasi_keluar';
         } else {
-            $view = 'pdf.baptis';
+            $view = 'pdf.default';
         }
-        
-        $answers = $request->form_answers; 
+
+        $answers = $request->form_answers;
         $pdf = Pdf::loadView($view, compact('request', 'pertanyaans', 'answers'))
-                ->setPaper('legal', 'portrait'); // Bisa juga 'landscape' jika diperlukan
+            ->setPaper('legal', 'portrait'); // Bisa juga 'landscape' jika diperlukan
 
         // **Simpan PDF ke Storage**
         $pdfFileName = 'form_permohonan_' . $request->id . '.pdf';
@@ -315,6 +418,8 @@ class FormPermohonan extends Component
 
     public function render()
     {
-        return view('livewire.form-permohonan');
+        return view('livewire.form-permohonan', [
+            'currentStep' => $this->step
+        ]);
     }
 }

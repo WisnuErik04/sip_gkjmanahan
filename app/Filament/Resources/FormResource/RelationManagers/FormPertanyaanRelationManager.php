@@ -30,12 +30,13 @@ class FormPertanyaanRelationManager extends RelationManager
     {
         return $form
             ->schema([
+                
+                TextInput::make('pertanyaan')
+                ->label('Pertanyaan')
+                ->required(),
+                TextInput::make('placeholder'),
+                
                 Section::make()->schema([
-
-                    TextInput::make('pertanyaan')
-                        ->label('Pertanyaan')
-                        ->required(),
-
                     Fieldset::make('Detail')
                         ->schema([
                             Select::make('tipe_jawaban')

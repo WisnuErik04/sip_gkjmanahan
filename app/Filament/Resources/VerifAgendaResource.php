@@ -452,7 +452,7 @@ class VerifAgendaResource extends Resource
                         $message .= "Jenis Permohonan: $JenisPermohonan\n";
                         $message .= "Status: $status\n";
                         $message .= "Keterangan: ".$notes."\n";
-                        $message .= "\nThanks,\nAdmin Sekretariat GKJ Manahan Surakarta";
+                        $message .= "\nTerima kasih,\nAdmin Sekretariat GKJ Manahan Surakarta";
                         $fonnteService->sendMessage($record->pemohon_hp_telepon, $message);
                     })
                     ->label('Agendakan')

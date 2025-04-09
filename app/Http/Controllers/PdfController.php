@@ -19,20 +19,21 @@ class PdfController extends Controller
         $formId = $request->form_id;
 
         // Ambil pertanyaan dan jawaban
-        $pertanyaans = FormPertanyaan::where('form_id', $formId)->get();
-        if ($formId == '2') {
-            $view = 'pdf.baptis_anak';
-        } elseif ($formId == '3') {
-            $view = 'pdf.baptis_dewasa';
-        } elseif ($formId == '4') {
-            $view = 'pdf.pernikahan';
-        } elseif ($formId == '5') {
-            $view = 'pdf.attestasi_masuk';
-        } elseif ($formId == '6') {
-            $view = 'pdf.attestasi_keluar';
-        } else {
-            $view = 'pdf.baptis';
-        }
+        $pertanyaans = FormPertanyaan::where('form_id', $formId)->orderBy('order')->get();
+        // if ($formId == '2') {
+        //     $view = 'pdf.baptis_anak';
+        // } elseif ($formId == '3') {
+        //     $view = 'pdf.baptis_dewasa';
+        // } elseif ($formId == '4') {
+        //     $view = 'pdf.pernikahan';
+        // } elseif ($formId == '5') {
+        //     $view = 'pdf.attestasi_masuk';
+        // } elseif ($formId == '6') {
+        //     $view = 'pdf.attestasi_keluar';
+        // } else {
+            $view = 'pdf.default';
+        // }
+        // dd($request->form->name);
         
         $answers = $request->form_answers; // Tidak perlu json_decode()
         // Tentukan template berdasarkan form_id

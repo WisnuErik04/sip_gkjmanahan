@@ -27,12 +27,12 @@ class ListUploadFormRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama Upload')
                     ->required()
                     ->maxLength(255),
                 
-                TextInput::make('name')
-                    ->label('Nama Upload')
-                    ->required(),
+                // TextInput::make('name')
+                //     ->required(),
 
                 Fieldset::make('Detail')
                     ->schema([

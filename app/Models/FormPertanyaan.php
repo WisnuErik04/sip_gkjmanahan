@@ -11,7 +11,7 @@ class FormPertanyaan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['form_id', 'pertanyaan', 'tipe_jawaban', 'opsi_jawaban', 'order', 'required'];
+    protected $fillable = ['form_id', 'pertanyaan', 'tipe_jawaban', 'opsi_jawaban', 'order', 'required', 'placeholder'];
     protected $with = ['form'];
     protected $casts = [
         'opsi_jawaban' => 'array', // Pastikan data otomatis di-cast ke array
