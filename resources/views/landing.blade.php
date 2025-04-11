@@ -16,11 +16,10 @@
             <div class="max-w-md mx-auto lg:max-w-none">
                 <div class="flex flex-wrap -mx-4">
 
-                    <div x-data="{ activeAccordion: null }" class="flex flex-wrap -mx-4">
+                    <div x-data="{ activeAccordion: null }" >
                         @foreach ($forms as $form)
                             <div class="w-full lg:w-1/2 px-4 mb-4 lg:mb-0">
-                                <div
-                                    class="w-full py-4 px-8 mb-4 bg-white text-left shadow-md rounded-2xl">
+                                <div class="py-4 px-8 mb-4 bg-white text-left shadow-md rounded-2xl">
                                     <div>
                                         <div class="flex items-start justify-between cursor-pointer"
                                              x-on:click.prevent="activeAccordion === {{ $form->id }} ? activeAccordion = null : activeAccordion = {{ $form->id }}">

@@ -7,16 +7,16 @@ use App\Models\Request;
 use Livewire\Component;
 use App\Models\UploadFile;
 use App\Models\RequestStatus;
-use Livewire\WithFileUploads;
+// use Livewire\WithFileUploads;
 use App\Models\FormPertanyaan;
 use App\Models\ListUploadForm;
 use App\Services\FonnteService;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Mail\RequestStatusesMail;
+// use App\Mail\RequestStatusesMail;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Redirect;
+// use Illuminate\Support\Facades\Redirect;
 use Spatie\LivewireFilepond\WithFilePond;
 
 class FormPermohonan extends Component
@@ -28,7 +28,7 @@ class FormPermohonan extends Component
     public $pemohon_nama, $pemohon_hp_telepon, $pemohon_email, $pemohon_warga_blok, $pemohon_alamat;
     public $form_id, $listUploads, $pertanyaans = [];
     public $uploadedFiles = [];
-    public $uploadedFilesa = [];
+    // public $uploadedFilesa = [];
     public $answers = [];
     public $uploadProgress = [];
     public $forms;
@@ -59,32 +59,36 @@ class FormPermohonan extends Component
         if ($this->step === 3) {
             $pertanyaans = FormPertanyaan::where('form_id', $this->form_id)->orderBy('order')->get();
             // $this->$pertanyaans = $pertanyaans;
+            $rules = [];
             $messages = [];
 
-            foreach ($pertanyaans as $pertanyaan) {
-                if ($pertanyaan->tipe_jawaban !== 'header') {
-                    $fieldName = 'answers.' . $pertanyaan->order;
-
-                    if (!isset($this->answers[$pertanyaan->order])) {
-                        $this->answers[$pertanyaan->order] = null;
-                    }
-
-                    if ($pertanyaan->required) {
-                        $rules[$fieldName] = 'required';
-                        $messages[$fieldName . '.required'] = $pertanyaan->pertanyaan . ' harus diisi.';
-                    } else {
-                        $rules[$fieldName] = 'nullable';
-                        $messages[$fieldName . '.nullable'] = '';
+                foreach ($pertanyaans as $pertanyaan) {
+                    if ($pertanyaan->tipe_jawaban !== 'header') {
+                        $fieldName = 'answers.' . $pertanyaan->order;
+    
+                        if (!isset($this->answers[$pertanyaan->order])) {
+                            $this->answers[$pertanyaan->order] = null;
+                        }
+    
+                        if ($pertanyaan->required) {
+                            $rules[$fieldName] = 'required';
+                            $messages[$fieldName . '.required'] = $pertanyaan->pertanyaan . ' harus diisi.';
+                        } else {
+                            $rules[$fieldName] = 'nullable';
+                            $messages[$fieldName . '.nullable'] = '';
+                        }
                     }
                 }
-            }
-            $this->validate($rules, $messages);
+                if (!empty($rules)) {
+                    $this->validate($rules, $messages);
+                }
         }
 
         if ($this->step === 4) {
             $listUploads = ListUploadForm::where('form_id', $this->form_id)->get();
             // $this->$listUploads = $listUploads;
             $messages = [];
+            $rules = [];
 
             foreach ($listUploads as $upload) {
                 $fieldName = 'uploadedFiles.' . $upload->id;
@@ -105,7 +109,9 @@ class FormPermohonan extends Component
                     $messages[$fieldName . '.mimes'] = $upload->name . ' harus berupa gambar (JPG, JPEG, PNG).';
                 }
             }
-            $this->validate($rules, $messages);
+            if (!empty($rules)) {
+                $this->validate($rules, $messages);
+            }
         }
         $this->step++;
     }
