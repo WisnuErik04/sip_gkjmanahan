@@ -143,7 +143,8 @@ class VerificationResource extends Resource
                         Forms\Components\Actions::make([
                             Forms\Components\Actions\Action::make('view_form')
                                 ->label('View Form')
-                                ->url(fn ($get) => Storage::url($get('form_file_path')))
+                                ->url(fn ($get) => route('file.viewForm', ['id' => $get('id')]))
+                                // ->url(fn ($get) => Storage::url($get('form_file_path')))
                                 ->openUrlInNewTab(),
     
                             Forms\Components\Actions\Action::make('view_form')
@@ -184,7 +185,8 @@ class VerificationResource extends Resource
                                         Forms\Components\Actions::make([
                                             Forms\Components\Actions\Action::make('download_' . $upload->id)
                                                 ->label('View ' . $upload->name)
-                                                ->url($filePath)
+                                                ->url(route('file.view', ['id' => $existingFile->id]))
+                                                // ->url($filePath)
                                                 // ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
                                                 ->openUrlInNewTab(),
                                             Forms\Components\Actions\Action::make('download_' . $upload->id)

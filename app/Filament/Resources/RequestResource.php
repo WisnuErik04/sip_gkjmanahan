@@ -107,7 +107,8 @@ class RequestResource extends Resource
                         Forms\Components\Actions::make([
                             Forms\Components\Actions\Action::make('view_form')
                                 ->label('View Form')
-                                ->url(fn ($get) => Storage::url($get('form_file_path')))
+                                ->url(fn ($get) => route('file.viewForm', ['id' => $get('id')]))
+                                // ->url(fn ($get) => Storage::url($get('form_file_path')))
                                 ->openUrlInNewTab(),
     
                             Forms\Components\Actions\Action::make('view_form')
@@ -202,7 +203,8 @@ class RequestResource extends Resource
                                     return Forms\Components\Actions::make([
                                         Forms\Components\Actions\Action::make('view_' . $upload->id)
                                             ->label('View ' . $upload->name)
-                                            ->url($filePath)
+                                            ->url(route('file.view', ['id' => $existingFile->id]))
+                                            // ->url($filePath)
                                             ->openUrlInNewTab(),
 
                                         Forms\Components\Actions\Action::make('download_' . $upload->id)

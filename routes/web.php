@@ -50,6 +50,10 @@ Route::get('/form-gagal', function () {
 // Route::get('/form-permohonan', [PublicFormController::class, 'index'])->name('form-permohonan');
 // Route::get('/form-permohonan', PublicForm::class)->name('public-form');
 Route::get('/download-file-upload/{id}', function ($id) {
+    if (!auth()->user()) {
+        abort(403);
+    }
+
     $file = UploadFile::findOrFail($id);
     
     // Ambil path dari storage
@@ -62,7 +66,30 @@ Route::get('/download-file-upload/{id}', function ($id) {
     abort(404, 'File tidak ditemukan');
 })->name('file.download');
 
+Route::get('/view-file-upload/{id}', function ($id) {
+    if (!auth()->user()) {
+        abort(403);
+    }
+
+    $file = UploadFile::findOrFail($id);
+    
+    // Ambil path dari storage
+    $filePath = $file->file_path;
+
+    if (Storage::disk('public')->exists($filePath)) {
+        // return Storage::disk('public')->view($filePath);
+        return response()->file(Storage::disk('public')->path($filePath));
+    }
+
+    abort(404, 'File tidak ditemukan');
+
+})->name('file.view');
+
 Route::get('/download-file/{id}', function ($id) {
+    if (!auth()->user()) {
+        abort(403);
+    }
+
     $file = Request::select('form_file_path')->findOrFail($id);
     
     // Ambil path dari storage
@@ -74,6 +101,24 @@ Route::get('/download-file/{id}', function ($id) {
 
     abort(404, 'File tidak ditemukan');
 })->name('file.downloadForm');
+Route::get('/view-file/{id}', function ($id) {
+    if (!auth()->user()) {
+        abort(403);
+    }
+
+    $file = Request::select('form_file_path')->findOrFail($id);
+    
+    // Ambil path dari storage
+    $filePath = $file->form_file_path;
+
+    if (Storage::disk('public')->exists($filePath)) {
+        // return Storage::disk('public')->download($filePath);
+        return response()->file(Storage::disk('public')->path($filePath));
+
+    }
+
+    abort(404, 'File tidak ditemukan');
+})->name('file.viewForm');
 
 Route::get('/laporan-agenda/excel/{id}', [ReportController::class, 'exportExcel'])->name('laporan.agenda.excel');
 Route::get('/laporan-pleno/excel/{id}', [ReportController::class, 'exportPlenoExcel'])->name('laporan.pleno.excel');

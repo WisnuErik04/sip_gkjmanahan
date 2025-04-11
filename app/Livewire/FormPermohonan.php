@@ -28,6 +28,7 @@ class FormPermohonan extends Component
     public $pemohon_nama, $pemohon_hp_telepon, $pemohon_email, $pemohon_warga_blok, $pemohon_alamat;
     public $form_id, $listUploads, $pertanyaans = [];
     public $uploadedFiles = [];
+    public $uploadedFilesa = [];
     public $answers = [];
     public $uploadProgress = [];
     public $forms;
@@ -38,7 +39,7 @@ class FormPermohonan extends Component
     public function nextStep()
     {
         $this->resetErrorBag(); // Reset error sebelum validasi
-
+        $this->dispatch('step-changed');
         if ($this->step === 1) {
             $this->validate([
                 'pemohon_nama' => 'required|string',
@@ -53,26 +54,6 @@ class FormPermohonan extends Component
             $this->validate([
                 'form_id' => 'required|exists:forms,id',
             ]);
-
-            // $pertanyaans = FormPertanyaan::where('form_id', $this->form_id)->orderBy('order')->get();
-            // $this->$pertanyaans = $pertanyaans;
-            // $listUploads = ListUploadForm::where('form_id', $this->form_id)->get();
-            // $this->$listUploads = $listUploads;
-            // foreach ($pertanyaans as $pertanyaan) {
-            //     if ($pertanyaan->required && $pertanyaan->tipe_jawaban !== 'header') {
-            //         $this->validate([
-            //             "answers.{$pertanyaan->order}" => 'required',
-            //         ]);
-            //     }
-            // }
-
-            // foreach ($listUploads as $upload) {
-            //     if ($upload->is_required) {
-            //         $this->validate([
-            //             "uploadedFiles.{$upload->id}" => 'required',
-            //         ]);
-            //     }
-            // }
         }
 
         if ($this->step === 3) {
@@ -132,6 +113,7 @@ class FormPermohonan extends Component
 
     public function previousStep()
     {
+        $this->dispatch('step-changed');
         $this->step--;
     }
 
@@ -151,6 +133,23 @@ class FormPermohonan extends Component
     // {
     //     $this->forms = Form::all(); // Ambil daftar form dari database
     // }
+
+    //    // Method ini akan dipanggil otomatis ketika nilai properti $file diubah
+    //    public function updatedUploadedFiles($value, $key)
+    //    {
+    //     logger("Updated file for key $key", [
+    //         'originalName' => $value->getClientOriginalName(),
+    //         'mimeType' => $value->getMimeType(),
+    //         'size' => $value->getSize(),
+    //         'temporaryPath' => $value->getRealPath(),
+    //     ]);        // if ($this->uploadedFilesa) {
+    //     //     $this_uploadedFilesa = $this->uploadedFilesa;
+    //     //     $this->uploadedFilesa = null;
+    //     //     session()->put('uploaded_file_name', $this_uploadedFilesa->getClientOriginalName());
+    //     // } else {
+    //     //     session()->flash('error', 'File tidak ada.');
+    //     // }
+    //    }
 
     public function mount($existingAnswers = [])
     {

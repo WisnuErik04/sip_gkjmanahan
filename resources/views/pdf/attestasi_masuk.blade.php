@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Permohonan</title>
+    <title>Permohonan Attestasi Masuk</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,44 +63,57 @@
 <body>
 
     <div class="container">
-        <p><b>Hal : <u>{{ $request->form->name }}</u></b></p>
+        <p class="right-align">Surakarta, {{ \Carbon\Carbon::parse($request->created_at)->locale('id')->translatedFormat('d F Y') }}</p>
+
+        <p><b>Hal : Permohonan Ingin Menjadi Warga <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GKJ Manahan</b></p>
 
         <p>Kepada Yth.<br>
             Majelis GKJ Manahan<br>
             Jl. MT Haryono No. 10<br>
             Surakarta</p>
 
-        {{-- <p>Salam Kasih dalam Tuhan Yesus Kristus,<br>
-            Yang bertanda tangan dibawah ini :</p> --}}
+        <p>Salam Kasih dalam Tuhan Yesus Kristus,<br>
+            Yang bertanda tangan dibawah ini :</p>
 
         <table>
-            @foreach ($pertanyaans as $key => $pertanyaan)
-                <tr>
-                    @if ($pertanyaan->tipe_jawaban === 'header')
-                        <td colspan="2">{{ $pertanyaan->pertanyaan }}</td>
-                    @else
-                        <td style="width:: 20%">{{ $pertanyaan->pertanyaan }}</td>
-                        <td>: {{ $answers[$pertanyaan->order] ?? '' }}</td>
-                    @endif
-                </tr>
-                
-            @endforeach
-            {{-- <tr>
-                <td>Jam</td>
+            <tr>
+                <td style="width:: 20%">Nama</td>
+                <td>: {{ $answers[2] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>Tempat/Tgl. Lahir</td>
                 <td>: {{ $answers[3] ?? '' }} WIB</td>
             </tr>
             <tr>
-                <td>Di</td>
+                <td>Alamat</td>
                 <td>: {{ $answers[4] ?? '' }}</td>
-            </tr> --}}
+            </tr>
+            <tr>
+                <td>Nama orang tua</td>
+                <td>: {{ $answers[5] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>Tempat/Tgl. Baptis/Sidi</td>
+                <td>: {{ $answers[6] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>No. HP/Telp.</td>
+                <td>: {{ $answers[7] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>Asal Gereja</td>
+                <td>: {{ $answers[8] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>Nama Suami/Isteri</td>
+                <td>: {{ $answers[9] ?? '' }}</td>
+            </tr>
         </table>
 
-      
+        <p>Dengan ini saya mengajukan  permohonan untuk diterima menjadi warga GKJ Manahan.<br>
+            Atas terkabulnya permohonan kami, diucapkan terima kasih.</p>
 
-        {{-- <p>Besar harapan kami, Majelis GKJ Manahan berkenan atas permohonan kami ini,<br>
-            Atas perhatian dan perkenannya, kami ucapkan terima kasih.</p> --}}
-
-        <p class="right-align">Surakarta, {{ \Carbon\Carbon::parse($request->created_at)->locale('id')->translatedFormat('d F Y') }}</p>
 
         <!-- Tanda Tangan Kanan & Kiri -->
         {{-- <div class="signature-container">
@@ -125,13 +138,13 @@
                     {{-- <p>______________________</p> --}}
                 </td>
                 <td style="width:50%; text-align:center;">
-                    &nbsp;<br>Pemohon
+                    Pemohon
                     <br><br><br><br><br>
                     <p><u>{{ $request->pemohon_nama ?? '' }}</u></p>
                 </td>
             </tr>
         </table>
-        {{-- <p>*Coret yang tidak diperlukan, dimohon menyertakan Fotocopy Akte Kelahiran.</p> --}}
+        <p><i>*) Mohon melampirkan fotocopy Surat Baptis/Sidi/Kartu Keluarga</i></p>
 
 
     </div>

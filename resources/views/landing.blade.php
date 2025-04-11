@@ -16,50 +16,46 @@
             <div class="max-w-md mx-auto lg:max-w-none">
                 <div class="flex flex-wrap -mx-4">
 
-
-                    @foreach ($forms as $form)
-                        <div class="w-full lg:w-1/2 px-4 mb-4 lg:mb-0">
-                            <button
-                                class="flex w-full py-4 px-8 mb-4 bg-white items-start justify-between text-left shadow-md rounded-2xl cursor-pointer"
-                                x-data="{ accordion: false }" x-on:click.prevent="accordion = !accordion">
-                                <div class="pr-5">
-                                    <h5 class="text-xl font-medium">{{ $form->name }}</h5>
-                                    <div class="overflow-hidden h-0 duration-500" x-ref="container"
-                                        :style="accordion ? 'height: ' + $refs.container.scrollHeight + 'px' : ''"
-                                        style="height: 112px">
-                                        <p class="text-gray-700 mt-4">{!! $form->content !!}</p>
+                    <div x-data="{ activeAccordion: null }" class="flex flex-wrap -mx-4">
+                        @foreach ($forms as $form)
+                            <div class="w-full lg:w-1/2 px-4 mb-4 lg:mb-0">
+                                <div
+                                    class="w-full py-4 px-8 mb-4 bg-white text-left shadow-md rounded-2xl">
+                                    <div>
+                                        <div class="flex items-start justify-between cursor-pointer"
+                                             x-on:click.prevent="activeAccordion === {{ $form->id }} ? activeAccordion = null : activeAccordion = {{ $form->id }}">
+                                            <h5 class="text-xl font-medium pr-5">{{ $form->name }}</h5>
+                                            <span class="flex-shrink-0">
+                                                <div x-show="activeAccordion !== {{ $form->id }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                         class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                                    </svg>
+                                                </div>
+                                                <div x-show="activeAccordion === {{ $form->id }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                         class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                              d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+                                                    </svg>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <div class="overflow-hidden transition-all duration-500"
+                                             x-ref="container{{ $form->id }}"
+                                             x-bind:style="activeAccordion === {{ $form->id }} ? 'height: ' + $refs.container{{ $form->id }}.scrollHeight + 'px' : 'height: 0px;'">
+                                            <p class="text-gray-700 mt-4">{!! $form->content !!}</p>
+                                        </div>
                                     </div>
                                 </div>
-                                <span class="flex-shrink-0">
-                                    <div :class="{ 'hidden': accordion }" class="hidden">
-                                        {{-- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M12 5.69995V18.3" stroke="#1D1F1E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                      <path d="M5.69995 12H18.3" stroke="#1D1F1E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                    </svg> --}}
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                            class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                        </svg>
+                            </div>
+                        @endforeach
+                    </div>
 
-                                    </div>
-                                    <div class="" :class="{ 'hidden': !accordion }">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                            class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="m4.5 15.75 7.5-7.5 7.5 7.5" />
-                                        </svg>
-
-                                    </div>
-                                </span>
-                            </button>
-
-
-                        </div>
-                    @endforeach
-
+        
                 </div>
             </div>
         </div>

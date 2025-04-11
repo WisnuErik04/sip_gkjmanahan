@@ -25,13 +25,13 @@ class PdfController extends Controller
         // } elseif ($formId == '3') {
         //     $view = 'pdf.baptis_dewasa';
         // } elseif ($formId == '4') {
-        //     $view = 'pdf.pernikahan';
+            $view = 'pdf.pernikahan';
         // } elseif ($formId == '5') {
-        //     $view = 'pdf.attestasi_masuk';
+            // $view = 'pdf.attestasi_masuk';
         // } elseif ($formId == '6') {
-        //     $view = 'pdf.attestasi_keluar';
+            // $view = 'pdf.attestasi_keluar';
         // } else {
-            $view = 'pdf.default';
+            // $view = 'pdf.default';
         // }
         // dd($request->form->name);
         
