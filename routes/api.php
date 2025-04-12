@@ -13,3 +13,6 @@ Route::get('/user', function (Request $request) {
 Route::get('/forms', [FormController::class, 'index']);
 Route::get('/forms/{id}', [FormController::class, 'show']);
 Route::post('/request', [RequestController::class, 'store']);
+Route::fallback(function () {
+    return response()->json(['message' => 'Route tidak ditemukan'], 404);
+});

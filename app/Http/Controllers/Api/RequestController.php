@@ -95,62 +95,62 @@ class RequestController extends Controller
                 ], 422);
             }
 
-            // // Simpan permohonan
-            // $permohonan = RequestModel::create([
-            //     'pemohon_nama' => $request->pemohon_nama,
-            //     'pemohon_hp_telepon' => $request->pemohon_hp_telepon,
-            //     'pemohon_email' => $request->pemohon_email,
-            //     'pemohon_warga_blok' => $request->pemohon_warga_blok,
-            //     'pemohon_alamat' => $request->pemohon_alamat,
-            //     'form_id' => $request->form_id,
-            //     'telah_dijadwalkan_sidang' => false,
-            //     'form_answers' => $answers,
-            //     'request_status_id' => RequestStatus::where('name', 'Pengajuan')->pluck('id')->first(),
-            // ]);
+            // Simpan permohonan
+            $permohonan = RequestModel::create([
+                'pemohon_nama' => $request->pemohon_nama,
+                'pemohon_hp_telepon' => $request->pemohon_hp_telepon,
+                'pemohon_email' => $request->pemohon_email,
+                'pemohon_warga_blok' => $request->pemohon_warga_blok,
+                'pemohon_alamat' => $request->pemohon_alamat,
+                'form_id' => $request->form_id,
+                'telah_dijadwalkan_sidang' => false,
+                'form_answers' => $answers,
+                'request_status_id' => RequestStatus::where('name', 'Pengajuan')->pluck('id')->first(),
+            ]);
 
-            // // Simpan file yang diunggah
-            // foreach ($request->uploadedFiles as $uploadId => $file) {
-            //     $path = $file->store('uploads/form_permohonan', 'public');
-            //     $size = round($file->getSize() / 1024, 2); // Konversi ke KB
-            //     $fileExtension = $file->getClientOriginalExtension();
+            // Simpan file yang diunggah
+            foreach ($request->uploadedFiles as $uploadId => $file) {
+                $path = $file->store('uploads/form_permohonan', 'public');
+                $size = round($file->getSize() / 1024, 2); // Konversi ke KB
+                $fileExtension = $file->getClientOriginalExtension();
 
-            //     UploadFile::create([
-            //         'request_id' => $permohonan->id,
-            //         'list_upload_form_id' => $uploadId,
-            //         'file_name' => ListUploadForm::find($uploadId)->name ?? 'Dokumen',
-            //         'file_path' => $path,
-            //         'file_type' => $fileExtension,
-            //         'file_size' => $size,
-            //     ]);
-            // }
+                UploadFile::create([
+                    'request_id' => $permohonan->id,
+                    'list_upload_form_id' => $uploadId,
+                    'file_name' => ListUploadForm::find($uploadId)->name ?? 'Dokumen',
+                    'file_path' => $path,
+                    'file_type' => $fileExtension,
+                    'file_size' => $size,
+                ]);
+            }
 
-            // // **Generate PDF dan Simpan Path dalam Request**
-            // $pdfPath = $this->generateAndSavePDF($permohonan);
-            // $permohonan->update(['form_file_path' => $pdfPath]);
+            // **Generate PDF dan Simpan Path dalam Request**
+            $pdfPath = $this->generateAndSavePDF($permohonan);
+            $permohonan->update(['form_file_path' => $pdfPath]);
 
-            // // Mengirim notifikasi via WhatsApp
-            // $JenisPermohonan = Form::where('id', $request->form_id)->pluck('name')->first();
-            // $status = 'Pengajuan';
-            // $notes = 'Permohonan telah diajukan dan diproses pada kesekretariatan';
-            // $data = [
-            //     'pemohon_nama' => $permohonan->pemohon_nama,
-            //     'pemohon_warga_blok' => $permohonan->pemohon_warga_blok,
-            //     'pemohon_alamat' => $permohonan->pemohon_alamat,
-            //     'form' => $JenisPermohonan,
-            //     'status' => $status,
-            //     'notes' => $notes,
-            // ];
-            // $fonnteService = new FonnteService();
-            // $message = "Detail Permohonan:\n";
-            // $message .= "Nama: $permohonan->pemohon_nama\n";
-            // $message .= "Warga Blok/Pepanthan: $permohonan->pemohon_warga_blok\n";
-            // $message .= "Jenis Permohonan: $JenisPermohonan\n";
-            // $message .= "Status: $status\n";
-            // $message .= "Keterangan: " . $notes . "\n";
-            // $message .= "\nTerima kasih,\nAdmin Sekretariat GKJ Manahan Surakarta";
-            // $fonnteService->sendMessage($permohonan->pemohon_hp_telepon, $message);
+            // Mengirim notifikasi via WhatsApp
+            $JenisPermohonan = Form::where('id', $request->form_id)->pluck('name')->first();
+            $status = 'Pengajuan';
+            $notes = 'Permohonan telah diajukan dan diproses pada kesekretariatan';
+            $data = [
+                'pemohon_nama' => $permohonan->pemohon_nama,
+                'pemohon_warga_blok' => $permohonan->pemohon_warga_blok,
+                'pemohon_alamat' => $permohonan->pemohon_alamat,
+                'form' => $JenisPermohonan,
+                'status' => $status,
+                'notes' => $notes,
+            ];
+            $fonnteService = new FonnteService();
+            $message = "Detail Permohonan:\n";
+            $message .= "Nama: $permohonan->pemohon_nama\n";
+            $message .= "Warga Blok/Pepanthan: $permohonan->pemohon_warga_blok\n";
+            $message .= "Jenis Permohonan: $JenisPermohonan\n";
+            $message .= "Status: $status\n";
+            $message .= "Keterangan: " . $notes . "\n";
+            $message .= "\nTerima kasih,\nAdmin Sekretariat GKJ Manahan Surakarta";
+            $fonnteService->sendMessage($permohonan->pemohon_hp_telepon, $message);
 
-            // DB::commit(); // **Simpan Semua Perubahan Jika Berhasil**
+            DB::commit(); // **Simpan Semua Perubahan Jika Berhasil**
 
             return response()->json([
                 'status' => true,
