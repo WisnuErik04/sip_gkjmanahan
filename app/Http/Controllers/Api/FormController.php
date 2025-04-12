@@ -48,8 +48,9 @@ class FormController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
+        $id = $request->id;
         try {
             $form = Form::select('id', 'name', 'content')->findOrFail($id);
 

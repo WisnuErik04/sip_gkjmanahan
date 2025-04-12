@@ -10,8 +10,8 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::get('/forms', [FormController::class, 'index']);
-Route::get('/forms/{id}', [FormController::class, 'show']);
+Route::post('/forms', [FormController::class, 'index']);
+Route::post('/form', [FormController::class, 'show']);
 Route::post('/request', [RequestController::class, 'store']);
 Route::fallback(function () {
     return response()->json(['message' => 'Route tidak ditemukan'], 404);
