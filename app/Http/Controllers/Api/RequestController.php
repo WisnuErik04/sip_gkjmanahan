@@ -37,8 +37,8 @@ class RequestController extends Controller
                     'required',
                     'regex:/^0\d{9,14}$/'
                 ],
-                'pemohon_email' => 'required|email',
-                'pemohon_warga_blok' => 'required|string',
+                'pemohon_email' => 'nullable|email',
+                'pemohon_warga_blok' => 'nullable',
                 'pemohon_alamat' => 'required|string',
                 'form_id' => 'required|exists:forms,id',
                 'uploadedFiles' => 'array',
@@ -110,7 +110,8 @@ class RequestController extends Controller
 
             // Simpan file yang diunggah
             foreach ($request->uploadedFiles as $uploadId => $file) {
-                $path = $file->store('uploads/form_permohonan', 'public');
+                // $path = $file->store('uploads/form_permohonan', 'public');
+                $path = $file->store('uploads/form_permohonan');
                 $size = round($file->getSize() / 1024, 2); // Konversi ke KB
                 $fileExtension = $file->getClientOriginalExtension();
 
@@ -205,7 +206,7 @@ class RequestController extends Controller
         $pdfFileName = 'form_permohonan_' . $request->id . '.pdf';
         $pdfPath = 'uploads/form_permohonan/' . $pdfFileName;
 
-        Storage::disk('public')->put($pdfPath, $pdf->output());
+        Storage::disk('local')->put($pdfPath, $pdf->output());
 
         return $pdfPath; // Path ini akan disimpan di tabel request
     }

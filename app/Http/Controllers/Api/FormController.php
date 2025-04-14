@@ -16,7 +16,7 @@ class FormController extends Controller
     public function index()
     {
         try {
-            $forms = Form::select('id', 'name', 'content')->get();
+            $forms = Form::select('id', 'name', 'content')->where('is_Active', true)->orderBy('order')->get();
             return response()->json([
                 'status' => true,
                 'message' => 'Formulir ditemukan',

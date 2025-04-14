@@ -39,6 +39,15 @@ class FormResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
+                        Forms\Components\TextInput::make('order')
+                                ->required()
+                                ->label('Urutan')
+                                ->default(1)
+                                ->numeric(),
+                        Forms\Components\Toggle::make('is_active')
+                                ->label('Aktif')
+                                ->default(true),
+
                         Forms\Components\RichEditor::make('content')
                             ->toolbarButtons([
                                 'attachFiles',
@@ -57,6 +66,7 @@ class FormResource extends Resource
                                 'undo',
                             ]),
                     ])
+                    // ->columns(2)
                     ->collapsible(),
                 // Forms\Components\Repeater::make('ListUploadForm')
                 //     ->relationship('listUploadForm') // Hubungkan dengan model bahan
@@ -106,6 +116,8 @@ class FormResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextInputColumn::make('order')->label('Urutan')->sortable(),
+                Tables\Columns\ToggleColumn::make('is_active')->label('Aktif'),
                 Tables\Columns\TextColumn::make('listUploadForm.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')

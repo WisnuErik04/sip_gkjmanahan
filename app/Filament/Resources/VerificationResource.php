@@ -269,7 +269,7 @@ class VerificationResource extends Resource
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('pemohon_warga_blok')
-                    ->label('Warga Blok/Pepanthan')
+                    ->label('Warga Blok/ Pepanthan/ Komisi/ Panitia/ Tim')
                     ->searchable(),
                 // Tables\Columns\TextColumn::make('user_id')
                 //     ->numeric()

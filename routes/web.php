@@ -59,8 +59,8 @@ Route::get('/download-file-upload/{id}', function ($id) {
     // Ambil path dari storage
     $filePath = $file->file_path;
 
-    if (Storage::disk('public')->exists($filePath)) {
-        return Storage::disk('public')->download($filePath);
+    if (Storage::disk('local')->exists($filePath)) {
+        return Storage::disk('local')->download($filePath);
     }
 
     abort(404, 'File tidak ditemukan');
@@ -76,9 +76,9 @@ Route::get('/view-file-upload/{id}', function ($id) {
     // Ambil path dari storage
     $filePath = $file->file_path;
 
-    if (Storage::disk('public')->exists($filePath)) {
-        // return Storage::disk('public')->view($filePath);
-        return response()->file(Storage::disk('public')->path($filePath));
+    if (Storage::disk('local')->exists($filePath)) {
+        // return Storage::disk('local')->view($filePath);
+        return response()->file(Storage::disk('local')->path($filePath));
     }
 
     abort(404, 'File tidak ditemukan');
@@ -95,8 +95,8 @@ Route::get('/download-file/{id}', function ($id) {
     // Ambil path dari storage
     $filePath = $file->form_file_path;
 
-    if (Storage::disk('public')->exists($filePath)) {
-        return Storage::disk('public')->download($filePath);
+    if (Storage::disk('local')->exists($filePath)) {
+        return Storage::disk('local')->download($filePath);
     }
 
     abort(404, 'File tidak ditemukan');
@@ -111,9 +111,9 @@ Route::get('/view-file/{id}', function ($id) {
     // Ambil path dari storage
     $filePath = $file->form_file_path;
 
-    if (Storage::disk('public')->exists($filePath)) {
-        // return Storage::disk('public')->download($filePath);
-        return response()->file(Storage::disk('public')->path($filePath));
+    if (Storage::disk('local')->exists($filePath)) {
+        // return Storage::disk('local')->download($filePath);
+        return response()->file(Storage::disk('local')->path($filePath));
 
     }
 

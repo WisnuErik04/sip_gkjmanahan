@@ -132,7 +132,7 @@ class VerifAgendaResource extends Resource
                             ->required()
                             ->maxLength(255),
                         TextInput::make('pemohon_warga_blok')
-                            ->label('Warga blok')
+                            ->label('Warga Blok/ Pepanthan/ Komisi/ Panitia/ Tim')
                             ->required()
                             ->maxLength(255),
                         Textarea::make('pemohon_alamat')

@@ -197,8 +197,7 @@
                     </script>
 
                     <div class="sm:col-span-2">
-                        <label for="pemohon_email" class="block text-sm/6 font-medium text-gray-900">Email <span
-                                class="text-red-500">*</span></label>
+                        <label for="pemohon_email" class="block text-sm/6 font-medium text-gray-900">Email </label>
                         <div class="mt-2">
                             <input type="email" wire:model="pemohon_email"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -209,12 +208,12 @@
                         </div>
                     </div>
                     <div class="sm:col-span-2">
-                        <label for="pemohon_warga_blok" class="block text-sm/6 font-medium text-gray-900">Warga
-                            Blok/Pepanthan <span class="text-red-500">*</span></label>
+                        <label for="pemohon_warga_blok" class="block text-sm/6 font-medium text-gray-900">
+                            Warga Blok/ Pepanthan/ Komisi/ Panitia/ Tim </label>
                         <div class="mt-2">
                             <input type="text" wire:model="pemohon_warga_blok"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                                placeholder="Warga Blok">
+                                placeholder="Blok 2">
                             @error('pemohon_warga_blok')
                                 <p class="text-red-500">{{ $message }}</p>
                             @enderror

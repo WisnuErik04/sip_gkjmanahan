@@ -76,7 +76,7 @@ class RequestResource extends Resource
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('pemohon_warga_blok')
-                            ->label('Warga blok')
+                            ->label('Warga Blok/ Pepanthan/ Komisi/ Panitia/ Tim')
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Textarea::make('pemohon_alamat')

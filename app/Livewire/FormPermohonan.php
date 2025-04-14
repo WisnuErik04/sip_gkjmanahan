@@ -44,8 +44,8 @@ class FormPermohonan extends Component
             $this->validate([
                 'pemohon_nama' => 'required|string',
                 'pemohon_hp_telepon' => 'required|regex:/^0\d{9,14}$/',
-                'pemohon_email' => 'required|email',
-                'pemohon_warga_blok' => 'required|string',
+                'pemohon_email' => 'nullable|email',
+                'pemohon_warga_blok' => 'nullable|string',
                 'pemohon_alamat' => 'required|string',
             ]);
         }
@@ -159,7 +159,7 @@ class FormPermohonan extends Component
 
     public function mount($existingAnswers = [])
     {
-        $this->forms = Form::select('id', 'name')->get(); // Ambil daftar form dari database
+        $this->forms = Form::select('id', 'name')->where('is_Active', true)->orderBy('order')->get(); // Ambil daftar form dari database
         $this->answers = $existingAnswers;
     }
 
@@ -228,8 +228,8 @@ class FormPermohonan extends Component
             $rules = [
                 'pemohon_nama' => 'required|string',
                 'pemohon_hp_telepon' => 'required|string',
-                'pemohon_email' => 'required|email',
-                'pemohon_warga_blok' => 'required|string',
+                'pemohon_email' => 'nullable|email',
+                'pemohon_warga_blok' => 'nullable|string',
                 'pemohon_alamat' => 'required|string',
                 'form_id' => 'required|exists:forms,id',
                 'uploadedFiles' => 'array',
@@ -292,7 +292,8 @@ class FormPermohonan extends Component
 
             // Simpan file yang diunggah
             foreach ($this->uploadedFiles as $uploadId => $file) {
-                $path = $file->store('uploads/form_permohonan', 'public');
+                // $path = $file->store('uploads/form_permohonan', 'public');
+                $path = $file->store('uploads/form_permohonan');
                 $size = round($file->getSize() / 1024, 2); // Konversi ke KB
                 $fileExtension = $file->getClientOriginalExtension();
 
@@ -386,7 +387,7 @@ class FormPermohonan extends Component
         $pdfFileName = 'form_permohonan_' . $request->id . '.pdf';
         $pdfPath = 'uploads/form_permohonan/' . $pdfFileName;
 
-        Storage::disk('public')->put($pdfPath, $pdf->output());
+        Storage::disk('local')->put($pdfPath, $pdf->output());
 
         return $pdfPath; // Path ini akan disimpan di tabel request
     }
@@ -397,7 +398,7 @@ class FormPermohonan extends Component
             'pemohon_nama' => 'Nama Pemohon',
             'pemohon_hp_telepon' => 'Nomor HP/Telpon',
             'pemohon_email' => 'Alamat Email',
-            'pemohon_warga_blok' => 'Blok Rumah',
+            'pemohon_warga_blok' => 'Blok',
             'pemohon_alamat' => 'Alamat Lengkap',
             'form_id' => 'Form Permohonan',
             'uploadedFiles.*' => 'File yang diunggah',
