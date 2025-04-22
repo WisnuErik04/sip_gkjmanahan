@@ -81,59 +81,73 @@
             </tr>
             <tr>
                 <td>Nomor Induk Gereja</td>
-                <td>: {{ $answers[3] ?? '' }} WIB</td>
+                <td>: {{ $answers[3] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Tempat/Tgl. Lahir</td>
-                <td>: {{ $answers[4] ?? '' }} WIB</td>
+                <td>: {{ $answers[4] ?? '' }} / {{ \Carbon\Carbon::parse($answers[5])->locale('id')->translatedFormat('d F Y') }}</td>
+
             </tr>
             <tr>
                 <td>Pekerjaan / Pendidikan</td>
-                <td>: {{ $answers[5] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td>Nama Ayah</td>
                 <td>: {{ $answers[6] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Nama Kecil Ibu</td>
+                <td>Nama Ayah</td>
                 <td>: {{ $answers[7] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Tempat/Tgl. Baptis/ Oleh</td>
+                <td>Nama Kecil Ibu</td>
                 <td>: {{ $answers[8] ?? '' }}</td>
             </tr>
             <tr>
+                <td>Tempat/Tgl. Baptis/ Oleh</td>
+                <td>: {{ $answers[9] ?? '' }} / {{ \Carbon\Carbon::parse($answers[10])->locale('id')->translatedFormat('d F Y') }} / {{ $answers[11] ?? '' }}</td>
+            </tr>
+            <tr>
                 <td>Tempat/Tgl. Sidi/ Oleh</td>
-                <td>: {{ $answers[9] ?? '' }}</td>
+                <td>: {{ $answers[12] ?? '' }} / {{ \Carbon\Carbon::parse($answers[13])->locale('id')->translatedFormat('d F Y') }} / {{ $answers[14] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Tempat/Tgl. Nikah</td>
-                <td>: {{ $answers[10] ?? '' }}</td>
+                <td>: {{ $answers[15] ?? '' }} / {{ \Carbon\Carbon::parse($answers[16])->locale('id')->translatedFormat('d F Y') }}</td>
             </tr>
             <tr>
                 <td>Nama Isteri / Suami</td>
-                <td>: {{ $answers[11] ?? '' }}</td>
+                <td>: {{ $answers[17] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Alamat Lama</td>
-                <td>: {{ $answers[12] ?? '' }}</td>
+                <td>: {{ $answers[18] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Alamat Baru</td>
-                <td>: {{ $answers[13] ?? '' }}</td>
+                <td>: {{ $answers[19] ?? '' }}</td>
             </tr>
             <tr>
                 <td>No HP./ Email</td>
-                <td>: {{ $answers[14] ?? '' }}</td>
+                <td>: {{ $answers[20] ?? '' }}</td>
             </tr>
             <tr>
                 <td>No. Telp</td>
-                <td>: {{ $answers[15] ?? '' }}</td>
+                <td>: {{ $answers[21] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Alasan pindah</td>
-                <td>: {{ $answers[16] ?? '' }}</td>
+                <td>: {{ $answers[22] ?? '' }}</td>
+            </tr>
+        </table>
+
+        <p>Anggota keluarga yang ikut pindah:</p>
+        
+        <table>
+            <tr>
+                <td style="width: 35%">Daftar Anak</td>
+                <td>: {{ $answers[24] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>Daftar Anggota Lainnya</td>
+                <td>: {{ $answers[25] ?? '' }}</td>
             </tr>
         </table>
 
@@ -142,16 +156,16 @@
         <table>
             <tr>
                 <td style="width: 35%">Gereja</td>
-                <td>: {{ $answers[18] ?? '' }}</td>
+                <td>: {{ $answers[27] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Alamat Gereja (ditulis dg jelas)</td>
-                <td>: {{ $answers[19] ?? '' }}</td>
+                <td>: {{ $answers[28] ?? '' }}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td>Nama-nama yg ikut pindah sbb</td>
                 <td>: (lihat halaman sebalik)</td>
-            </tr>
+            </tr> --}}
         </table>
         <p>Sekian dan atas bantuannya kami ucapkan terima kasih.</p>
 

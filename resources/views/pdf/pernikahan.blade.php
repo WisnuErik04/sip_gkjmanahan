@@ -92,37 +92,37 @@
             <tr>
                 <td></td>
                 <td>Tempat dan Tgl. Lahir</td>
-                <td>: {{ $answers[4] ?? '' }}</td>
+                <td>: {{ $answers[4] ?? '' }} / {{ \Carbon\Carbon::parse($answers[5])->locale('id')->translatedFormat('d F Y') }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Pekerjaan</td>
-                <td>: {{ $answers[5] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Alamat Rumah</td>
                 <td>: {{ $answers[6] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
-                <td>Nomor Telp.</td>
+                <td>Alamat Rumah</td>
                 <td>: {{ $answers[7] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
-                <td>Warga Gereja</td>
+                <td>Nomor Telp.</td>
                 <td>: {{ $answers[8] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
-                <td>Tempat tgl. Baptis/oleh</td>
+                <td>Warga Gereja</td>
                 <td>: {{ $answers[9] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
+                <td>Tempat tgl. Baptis/oleh</td>
+                <td>: {{ $answers[10] ?? '' }} / {{ \Carbon\Carbon::parse($answers[11])->locale('id')->translatedFormat('d F Y') }} / {{ $answers[12] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td></td>
                 <td>Tempat tgl. Sidi / oleh</td>
-                <td>: {{ $answers[10] ?? '' }}</td>
+                <td>: {{ $answers[13] ?? '' }} / {{ \Carbon\Carbon::parse($answers[14])->locale('id')->translatedFormat('d F Y') }} / {{ $answers[15] ?? '' }}</td>
             </tr>
             {{-- ========================= --}}
             <tr>
@@ -132,22 +132,22 @@
             <tr>
                 <td >II.</td>
                 <td style="width: 25%">Nama Lengkap (Ayah)</td>
-                <td>: {{ $answers[12] ?? '' }}</td>
+                <td>: {{ $answers[17] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Tgl. Lahir / Usia/ Agama</td>
-                <td>: {{ $answers[13] ?? '' }} </td>
+                <td>: {{ \Carbon\Carbon::parse($answers[18])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[55])->age }} / {{ $answers[19] ?? '' }} </td>
             </tr>
             <tr>
                 <td></td>
                 <td>Pekerjaan</td>
-                <td>: {{ $answers[14] ?? '' }}</td>
+                <td>: {{ $answers[20] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Alamat Rumah</td>
-                <td>: {{ $answers[15] ?? '' }}</td>
+                <td>: {{ $answers[21] ?? '' }}</td>
             </tr>
             {{-- ========================= --}}
             <tr>
@@ -157,22 +157,22 @@
             <tr>
                 <td >III.</td>
                 <td style="width: 25%">Nama Kecil (Ibu)</td>
-                <td>: {{ $answers[17] ?? '' }}</td>
+                <td>: {{ $answers[23] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Tgl. Lahir / Usia/ Agama</td>
-                <td>: {{ $answers[18] ?? '' }} </td>
+                <td>: {{ \Carbon\Carbon::parse($answers[24])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[55])->age }} / {{ $answers[25] ?? '' }} </td>
             </tr>
             <tr>
                 <td></td>
                 <td>Pekerjaan</td>
-                <td>: {{ $answers[19] ?? '' }}</td>
+                <td>: {{ $answers[26] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Alamat Rumah</td>
-                <td>: {{ $answers[20] ?? '' }}</td>
+                <td>: {{ $answers[27] ?? '' }}</td>
             </tr>
             {{-- ========================= --}}
             <tr>
@@ -182,17 +182,20 @@
             <tr>
                 <td >IV.</td>
                 <td style="width: 25%">Tunangan/Hari/Tgl</td>
-                <td>: {{ $answers[22] ?? '' }}</td>
+                <td>: {{ \Carbon\Carbon::parse($answers[29])->locale('id')->translatedFormat('l, d F Y') }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Nikah Capil/Pemerintah</td>
-                <td>: Hari: {{ $answers[23] ?? '' }} &nbsp;&nbsp;&nbsp;Tanggal: {{ $answers[24] ?? '' }} &nbsp;&nbsp;&nbsp;Jam: {{ $answers[25] ?? '' }}</td>
+                <td>: Hari: {{ \Carbon\Carbon::parse($answers[30])->locale('id')->translatedFormat('l') }}
+                    &nbsp;&nbsp;&nbsp;Tanggal: {{ \Carbon\Carbon::parse($answers[30])->locale('id')->translatedFormat('d F Y') }}
+                    &nbsp;&nbsp;&nbsp;Jam: {{ $answers[31].' WIB' ?? '' }}
+                </td>
             </tr>
             <tr>
                 <td></td>
                 <td>Tempat di</td>
-                <td>: {{ $answers[26] ?? '' }}</td>
+                <td>: {{ $answers[32] ?? '' }}</td>
             </tr>
             {{-- ========================= --}}
             <tr>
@@ -202,42 +205,42 @@
             <tr>
                 <td >V.</td>
                 <td style="width: 25%">Nama Calon Suami/Isteri</td>
-                <td>: {{ $answers[28] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Nomor Induk Gereja (NIG)</td>
-                <td>: {{ $answers[29] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Tempat dan Tgl. Lahir</td>
-                <td>: {{ $answers[30] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Alamat Rumah</td>
-                <td>: {{ $answers[31] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Nomor Telp.</td>
-                <td>: {{ $answers[32] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Warga Gereja</td>
-                <td>: {{ $answers[33] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Tempat tgl. Baptis/oleh</td>
                 <td>: {{ $answers[34] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
-                <td>Tempat tgl. Sidi / oleh</td>
+                <td>Nomor Induk Gereja (NIG)</td>
                 <td>: {{ $answers[35] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Tempat dan Tgl. Lahir</td>
+                <td>: {{ $answers[36] ?? '' }} / {{ \Carbon\Carbon::parse($answers[37])->locale('id')->translatedFormat('d F Y') }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Alamat Rumah</td>
+                <td>: {{ $answers[38] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Nomor Telp.</td>
+                <td>: {{ $answers[39] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Warga Gereja</td>
+                <td>: {{ $answers[40] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Tempat tgl. Baptis/oleh</td>
+                <td>: {{ $answers[41] ?? '' }} / {{ \Carbon\Carbon::parse($answers[42])->locale('id')->translatedFormat('d F Y') }} / {{ $answers[43] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>Tempat tgl. Sidi / oleh</td>
+                <td>: {{ $answers[44] ?? '' }} / {{ \Carbon\Carbon::parse($answers[45])->locale('id')->translatedFormat('d F Y') }} / {{ $answers[46] ?? '' }}</td>
             </tr>
             {{-- ========================= --}}
             <tr>
@@ -247,22 +250,22 @@
             <tr>
                 <td >VI.</td>
                 <td style="width: 25%">Nama Lengkap (Ayah)</td>
-                <td>: {{ $answers[37] ?? '' }}</td>
+                <td>: {{ $answers[48] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Tgl. Lahir / Usia/ Agama</td>
-                <td>: {{ $answers[38] ?? '' }} </td>
+                <td>: {{ \Carbon\Carbon::parse($answers[49])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[55])->age }} / {{ $answers[50] ?? '' }} </td>
             </tr>
             <tr>
                 <td></td>
                 <td>Pekerjaan</td>
-                <td>: {{ $answers[39] ?? '' }}</td>
+                <td>: {{ $answers[51] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Alamat Rumah</td>
-                <td>: {{ $answers[40] ?? '' }}</td>
+                <td>: {{ $answers[52] ?? '' }}</td>
             </tr>
             {{-- ========================= --}}
             {{-- ========================= --}}
@@ -273,22 +276,22 @@
             <tr>
                 <td >VII.</td>
                 <td style="width: 25%">Nama Kecil (Ibu)</td>
-                <td>: {{ $answers[42] ?? '' }}</td>
+                <td>: {{ $answers[54] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Tgl. Lahir / Usia/ Agama</td>
-                <td>: {{ $answers[43] ?? '' }} </td>
+                <td>: {{ \Carbon\Carbon::parse($answers[55])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[55])->age }} / {{ $answers[56] ?? '' }} </td>
             </tr>
             <tr>
                 <td></td>
                 <td>Pekerjaan</td>
-                <td>: {{ $answers[44] ?? '' }}</td>
+                <td>: {{ $answers[57] ?? '' }}</td>
             </tr>
             <tr>
                 <td></td>
                 <td>Alamat Rumah</td>
-                <td>: {{ $answers[45] ?? '' }}</td>
+                <td>: {{ $answers[58] ?? '' }}</td>
             </tr>
             {{-- ========================= --}}
             <tr>
@@ -303,23 +306,23 @@
             {{-- ========================= --}}
             <tr>
                 <td colspan="2" style="width: 25%">Nama</td>
-                <td>: {{ $answers[47] ?? '' }}</td>
+                <td>: {{ $answers[60] ?? '' }}</td>
             </tr>
             <tr>
                 <td colspan="2" >Usia / Agama</td>
-                <td>: {{ $answers[48] ?? '' }} </td>
+                <td>: {{ $answers[61] ?? '' }} </td>
             </tr>
             <tr>
                 <td colspan="2" >Pekerjaan</td>
-                <td>: {{ $answers[49] ?? '' }} </td>
+                <td>: {{ $answers[62] ?? '' }} </td>
             </tr>
             <tr>
                 <td colspan="2" >Alamat Rumah</td>
-                <td>: {{ $answers[50] ?? '' }} </td>
+                <td>: {{ $answers[63] ?? '' }} </td>
             </tr>
             <tr>
                 <td colspan="2" >Hubungan keluarga</td>
-                <td>: {{ $answers[51] ?? '' }} </td>
+                <td>: {{ $answers[64] ?? '' }} </td>
             </tr>
             {{-- ========================= --}}
             <tr>
@@ -331,23 +334,23 @@
             {{-- ========================= --}}
             <tr>
                 <td colspan="2" style="width: 25%">Nama</td>
-                <td>: {{ $answers[53] ?? '' }}</td>
+                <td>: {{ $answers[66] ?? '' }}</td>
             </tr>
             <tr>
                 <td colspan="2" >Usia / Agama</td>
-                <td>: {{ $answers[54] ?? '' }} </td>
+                <td>: {{ $answers[67] ?? '' }} </td>
             </tr>
             <tr>
                 <td colspan="2" >Pekerjaan</td>
-                <td>: {{ $answers[55] ?? '' }} </td>
+                <td>: {{ $answers[68] ?? '' }} </td>
             </tr>
             <tr>
                 <td colspan="2" >Alamat Rumah</td>
-                <td>: {{ $answers[56] ?? '' }} </td>
+                <td>: {{ $answers[69] ?? '' }} </td>
             </tr>
             <tr>
                 <td colspan="2" >Hubungan keluarga</td>
-                <td>: {{ $answers[57] ?? '' }} </td>
+                <td>: {{ $answers[70] ?? '' }} </td>
             </tr>
         </table>
 

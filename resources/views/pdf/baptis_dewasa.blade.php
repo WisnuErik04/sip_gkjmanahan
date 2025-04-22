@@ -79,7 +79,7 @@
         <table>
             <tr>
                 <td style="width:: 20%">Hari/Tanggal</td>
-                <td>: {{ $answers[2] ?? '' }}</td>
+                <td>: {{ \Carbon\Carbon::parse($answers[2])->locale('id')->translatedFormat('l, d F Y') }}</td>
             </tr>
             <tr>
                 <td>Jam</td>
@@ -100,47 +100,47 @@
             </tr>
             <tr>
                 <td>Tempat/Tanggal Lahir</td>
-                <td>: {{ $answers[7] ?? '' }}</td>
+                <td>: {{ $answers[7] ?? '' }} / {{ \Carbon\Carbon::parse($answers[8])->locale('id')->translatedFormat('d F Y') }}</td>
             </tr>
             <tr>
                 <td>Jenis Kelamin</td>
-                <td>: {{ $answers[8] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td>Pekerjaan/Pendidikan</td>
                 <td>: {{ $answers[9] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Nama Lengkap Ayah</td>
+                <td>Pekerjaan/Pendidikan</td>
                 <td>: {{ $answers[10] ?? '' }}</td>
             </tr>
             <tr>
-                <td><span style="color: white">Nama Lengkap</span> Ibu</td>
+                <td>Nama Lengkap Ayah</td>
                 <td>: {{ $answers[11] ?? '' }}</td>
             </tr>
             <tr>
-                <td>HP/Telepon</td>
+                <td><span style="color: white">Nama Lengkap</span> Ibu</td>
                 <td>: {{ $answers[12] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Email</td>
+                <td>HP/Telepon</td>
                 <td>: {{ $answers[13] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Alamat</td>
+                <td>Email</td>
                 <td>: {{ $answers[14] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Warga Blok/Pepanthan</td>
+                <td>Alamat</td>
                 <td>: {{ $answers[15] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Pengasuh/Tempat Katekisasi</td>
+                <td>Warga Blok/Pepanthan</td>
                 <td>: {{ $answers[16] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Lama Katekisasi</td>
+                <td>Pengasuh/Tempat Katekisasi</td>
                 <td>: {{ $answers[17] ?? '' }}</td>
+            </tr>
+            <tr>
+                <td>Lama Katekisasi</td>
+                <td>: {{ $answers[18] ?? '' }}</td>
             </tr>
         </table>
 
@@ -149,15 +149,15 @@
         <table>
             <tr>
                 <td>Baptis Kecil tanggal</td>
-                <td>: {{ $answers[19] ?? '' }}</td>
+                <td>: {{ \Carbon\Carbon::parse($answers[20])->locale('id')->translatedFormat('d F Y') }}</td>
             </tr>
             <tr>
                 <td>Di Gereja</td>
-                <td>: {{ $answers[20] ?? '' }}</td>
+                <td>: {{ $answers[21] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Oleh</td>
-                <td>: {{ $answers[21] ?? '' }}</td>
+                <td>: {{ $answers[22] ?? '' }}</td>
             </tr>
         </table>
 

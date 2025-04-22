@@ -79,6 +79,18 @@
                     @if ($pertanyaan->tipe_jawaban === 'header')
                         <td colspan="2">{{ $pertanyaan->pertanyaan }}</td>
                     @else
+                        @if ($answers[$pertanyaan->order] && \Carbon\Carbon::hasFormat($answers[$pertanyaan->order], 'Y-m-d')) 
+                            @php
+                                $formatTanggal = \Carbon\Carbon::parse($answers[$pertanyaan->order])->locale('id')->translatedFormat('d F Y');
+                            
+                                $answers[$pertanyaan->order] = $formatTanggal; // Selasa, 15 April 2025    
+                            @endphp 
+                        @endif
+                        @if ($answers[$pertanyaan->order] && \Carbon\Carbon::hasFormat($answers[$pertanyaan->order], 'h:i')) 
+                            @php                            
+                                $answers[$pertanyaan->order] .= " WIB"; // Selasa, 15 April 2025    
+                            @endphp 
+                        @endif
                         <td style="width:: 20%">{{ $pertanyaan->pertanyaan }}</td>
                         <td>: {{ $answers[$pertanyaan->order] ?? '' }}</td>
                     @endif

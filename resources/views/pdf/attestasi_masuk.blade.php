@@ -83,31 +83,31 @@
             </tr>
             <tr>
                 <td>Tempat/Tgl. Lahir</td>
-                <td>: {{ $answers[3] ?? '' }} WIB</td>
+                <td>: {{ $answers[3] ?? '' }} / {{ \Carbon\Carbon::parse($answers[4])->locale('id')->translatedFormat('d F Y') }}</td>
             </tr>
             <tr>
                 <td>Alamat</td>
-                <td>: {{ $answers[4] ?? '' }}</td>
-            </tr>
-            <tr>
-                <td>Nama orang tua</td>
                 <td>: {{ $answers[5] ?? '' }}</td>
             </tr>
             <tr>
-                <td>Tempat/Tgl. Baptis/Sidi</td>
+                <td>Nama orang tua</td>
                 <td>: {{ $answers[6] ?? '' }}</td>
             </tr>
             <tr>
+                <td>Tempat/Tgl. Baptis/Sidi</td>
+                <td>: {{ $answers[7] ?? '' }} / {{ \Carbon\Carbon::parse($answers[8])->locale('id')->translatedFormat('d F Y') }}</td>
+            </tr>
+            <tr>
                 <td>No. HP/Telp.</td>
-                <td>: {{ $answers[7] ?? '' }}</td>
+                <td>: {{ $answers[9] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Asal Gereja</td>
-                <td>: {{ $answers[8] ?? '' }}</td>
+                <td>: {{ $answers[10] ?? '' }}</td>
             </tr>
             <tr>
                 <td>Nama Suami/Isteri</td>
-                <td>: {{ $answers[9] ?? '' }}</td>
+                <td>: {{ $answers[11] ?? '' }}</td>
             </tr>
         </table>
 
