@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('Requests', function (Blueprint $table) {
+        Schema::table('requests', function (Blueprint $table) {
             $table->enum('tipe_request', ['mobile', 'web']);
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('Requests', function (Blueprint $table) {
+        Schema::table('requests', function (Blueprint $table) {
             $table->dropColumn('tipe_request');
         });
     }
