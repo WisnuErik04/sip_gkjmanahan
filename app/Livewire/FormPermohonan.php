@@ -288,6 +288,7 @@ class FormPermohonan extends Component
                 'form_answers' => $this->answers,
                 // 'user_id' => '1',
                 'request_status_id' => RequestStatus::where('name', 'Pengajuan')->pluck('id')->first(),
+                'tipe_request' => 'web', // ['mobile', 'web']
             ]);
 
             // Simpan file yang diunggah

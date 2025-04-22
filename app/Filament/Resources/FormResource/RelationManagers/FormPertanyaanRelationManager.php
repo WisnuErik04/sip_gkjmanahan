@@ -44,6 +44,8 @@ class FormPertanyaanRelationManager extends RelationManager
                                 ->options([
                                     'text' => 'Text',
                                     'textarea' => 'Textarea',
+                                    'date' => 'Date',
+                                    'time' => 'Time',
                                     'select' => 'Select',
                                     'checkbox' => 'Checkbox',
                                     'radio' => 'Radio',
@@ -102,6 +104,8 @@ class FormPertanyaanRelationManager extends RelationManager
                     ->color(fn(string $state): string => match ($state) {
                         'text' => 'gray',
                         'textarea' => 'primary',
+                        'date' => 'warning',
+                        'time' => 'success',
                         'select' => 'info',
                         'checkbox' => 'warning',
                         'radio' => 'success',

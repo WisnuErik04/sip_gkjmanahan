@@ -302,6 +302,14 @@
                                             <input placeholder="{{ $pertanyaan->placeholder }}" type="text"
                                                 wire:model="answers.{{ $pertanyaan->order }}"
                                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6">
+                                        @elseif ($pertanyaan->tipe_jawaban === 'date')
+                                            <input placeholder="{{ $pertanyaan->placeholder }}" type="date"
+                                                wire:model="answers.{{ $pertanyaan->order }}"
+                                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6">
+                                        @elseif ($pertanyaan->tipe_jawaban === 'time')
+                                            <input placeholder="{{ $pertanyaan->placeholder }}" type="time"
+                                                wire:model="answers.{{ $pertanyaan->order }}"
+                                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6">
                                         @elseif ($pertanyaan->tipe_jawaban === 'textarea')
                                             <textarea placeholder="{{ $pertanyaan->placeholder }}" wire:model="answers.{{ $pertanyaan->order }}"
                                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6">

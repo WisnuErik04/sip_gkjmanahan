@@ -7,9 +7,12 @@ use Illuminate\Database\QueryException;
 use App\Filament\Resources\FormResource;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class AgendaDetail extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['no_surat', 'perihal', 'dari', 'tanggal_masuk', 'usulan_keputusan', 'keterangan', 'jenis_id', 'agenda_id', 'keterangan_id', 'request_id'];
 
     protected $with = ['agendaKeterangan', 'agenda', 'agendaJenis', 'request'];

@@ -29,6 +29,7 @@ class Request extends Model
         'form_file_path',
         'request_status_id',
         'telah_dijadwalkan_sidang',
+        'tipe_request',
     ];
     protected $casts = [
         'form_answers' => 'array',

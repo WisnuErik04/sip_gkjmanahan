@@ -106,6 +106,7 @@ class RequestController extends Controller
                 'telah_dijadwalkan_sidang' => false,
                 'form_answers' => $answers,
                 'request_status_id' => RequestStatus::where('name', 'Pengajuan')->pluck('id')->first(),
+                'tipe_request' => 'mobile', // ['mobile', 'web']
             ]);
 
             // Simpan file yang diunggah
