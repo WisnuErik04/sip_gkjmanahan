@@ -8,22 +8,23 @@ use Livewire\Component;
 use App\Models\UploadFile;
 use App\Models\RequestStatus;
 // use Livewire\WithFileUploads;
+use Livewire\WithFileUploads;
 use App\Models\FormPertanyaan;
 use App\Models\ListUploadForm;
 use App\Services\FonnteService;
-use Barryvdh\DomPDF\Facade\Pdf;
 // use App\Mail\RequestStatusesMail;
-use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 // use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Spatie\LivewireFilepond\WithFilePond;
 
 class FormPermohonan extends Component
 {
 
     use WithFilePond;
-    // use WithFileUploads;
+    use WithFileUploads;
 
     public $pemohon_nama, $pemohon_hp_telepon, $pemohon_email, $pemohon_warga_blok, $pemohon_alamat;
     public $form_id, $listUploads, $pertanyaans = [];
@@ -135,6 +136,20 @@ class FormPermohonan extends Component
         $this->pertanyaans = FormPertanyaan::where('form_id', $this->form_id)->orderBy('order')->get();
     }
 
+//     public function updated($propertyName)
+// {
+//     session()->put('form_data.' . $propertyName, $this->$propertyName);
+// }
+
+    public function updated($propertyName)
+    {
+        $value = data_get($this, $propertyName);
+        if ($value instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile || is_array($value)) {
+            return;
+        }
+        session()->put('form_data.' . $propertyName, $value);
+    }
+
     // public function mount()
     // {
     //     $this->forms = Form::all(); // Ambil daftar form dari database
@@ -161,6 +176,18 @@ class FormPermohonan extends Component
     {
         $this->forms = Form::select('id', 'name')->where('is_Active', true)->orderBy('order')->get(); // Ambil daftar form dari database
         $this->answers = $existingAnswers;
+        $data = session('form_data', []);
+        // echo"<pre>";
+        foreach ($data as $key => $value) {
+            if ($key == 'form_id') {
+                // print_r($key);
+                $this->listUploads = ListUploadForm::where('form_id', $value)->get();
+                $this->pertanyaans = FormPertanyaan::where('form_id', $value)->orderBy('order')->get();
+            }   
+            data_set($this, $key, $value);
+        }
+        // echo"</pre>";
+
     }
 
     // public function submit()
@@ -220,6 +247,7 @@ class FormPermohonan extends Component
     {
         DB::beginTransaction(); // Mulai transaksi untuk mencegah error
 
+        session()->forget('form_data');
         try {
 
             $listUploads = ListUploadForm::where('form_id', $this->form_id)->get();
