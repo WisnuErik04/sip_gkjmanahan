@@ -247,7 +247,7 @@ class FormPermohonan extends Component
     {
         DB::beginTransaction(); // Mulai transaksi untuk mencegah error
 
-        session()->forget('form_data');
+        // session()->forget('form_data');
         try {
 
             $listUploads = ListUploadForm::where('form_id', $this->form_id)->get();
@@ -411,7 +411,9 @@ class FormPermohonan extends Component
         $answers = $request->form_answers;
         $pdf = Pdf::loadView($view, compact('request', 'pertanyaans', 'answers'))
             ->setPaper('legal', 'portrait'); // Bisa juga 'landscape' jika diperlukan
-
+        // $pdf->stream('formulir.pdf');
+        // return $pdf->stream('formulir.pdf');
+            // dd('asasas');
         // **Simpan PDF ke Storage**
         $pdfFileName = 'form_permohonan_' . $request->id . '.pdf';
         $pdfPath = 'uploads/form_permohonan/' . $pdfFileName;

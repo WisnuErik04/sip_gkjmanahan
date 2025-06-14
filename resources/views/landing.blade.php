@@ -9,7 +9,7 @@
                     href="{{ route('form-permohonan') }}">Ajukan Permohonan
                 </a>
                 <p class="text-lg text-white opacity-80 mt-12 mb-6">
-                    Berikut persyarata dan formulir kegiatan yang berkaitan dengan Gereja Kristen Jawa (GKJ)
+                    Berikut persyaratan dan formulir kegiatan yang berkaitan dengan Gereja Kristen Jawa (GKJ)
                     Manahan. Daftar formulir selengkapnya dapat di lihat di halaman akhir di bawah ini.
                 </p>
             </div>

@@ -6,11 +6,11 @@
 @layer base {
     ol {
         list-style: decimal !important;
-        padding-left: 20px !important;
+        padding-left: 30px !important;
     }
     ul {
         list-style: disc;
-        padding-left: 20px !important;
+        padding-left: 30px !important;
     }
     li {
         display: list-item !important;

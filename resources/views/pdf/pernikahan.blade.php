@@ -137,7 +137,7 @@
             <tr>
                 <td></td>
                 <td>Tgl. Lahir / Usia/ Agama</td>
-                <td>: {{ \Carbon\Carbon::parse($answers[18])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[55])->age }} / {{ $answers[19] ?? '' }} </td>
+                <td>: {{ \Carbon\Carbon::parse($answers[18])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[18])->age }} / {{ $answers[19] ?? '' }} </td>
             </tr>
             <tr>
                 <td></td>
@@ -162,7 +162,7 @@
             <tr>
                 <td></td>
                 <td>Tgl. Lahir / Usia/ Agama</td>
-                <td>: {{ \Carbon\Carbon::parse($answers[24])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[55])->age }} / {{ $answers[25] ?? '' }} </td>
+                <td>: {{ \Carbon\Carbon::parse($answers[24])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[24])->age }} / {{ $answers[25] ?? '' }} </td>
             </tr>
             <tr>
                 <td></td>
@@ -255,7 +255,7 @@
             <tr>
                 <td></td>
                 <td>Tgl. Lahir / Usia/ Agama</td>
-                <td>: {{ \Carbon\Carbon::parse($answers[49])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[55])->age }} / {{ $answers[50] ?? '' }} </td>
+                <td>: {{ \Carbon\Carbon::parse($answers[49])->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse($answers[49])->age }} / {{ $answers[50] ?? '' }} </td>
             </tr>
             <tr>
                 <td></td>

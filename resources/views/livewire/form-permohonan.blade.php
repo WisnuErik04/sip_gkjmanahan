@@ -296,6 +296,7 @@
                                             <span class="text-red-500">*</span>
                                         @endif
                                     </label>
+                {{-- <td>: {{ \Carbon\Carbon::parse('2020-04-04')->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse('2020-04-04')->age }} / {{ '2025-04-04' }} </td> --}}
 
                                     <div class="mt-2">
                                         @if ($pertanyaan->tipe_jawaban === 'text')
