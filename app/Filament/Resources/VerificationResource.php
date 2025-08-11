@@ -102,131 +102,286 @@ class VerificationResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Pemohon ')
-                    ->description('Data diri pemohon')
+                Forms\Components\Grid::make()
                     ->schema([
-                        Forms\Components\TextInput::make('pemohon_nama')
-                            ->label('Nama')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('pemohon_hp_telepon')
-                            ->tel()
-                            ->label('No Hp/telepon')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('pemohon_email')
-                            ->email()
-                            ->label('Email')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('pemohon_warga_blok')
-                            ->label('Warga blok')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Textarea::make('pemohon_alamat')
-                            ->label('Alamat')
-                            ->required()
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
+                        // Kolom kiri - form utama
+                        Forms\Components\Section::make('Data Permohonan')
+                            ->schema([
+                                Forms\Components\Section::make('Data diri pemohon')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('pemohon_nama')
+                                            ->label('Nama')
+                                            ->disabled()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('pemohon_hp_telepon')
+                                            ->tel()
+                                            ->disabled()
+                                            ->label('No Hp/telepon')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('pemohon_email')
+                                            ->email()
+                                            ->disabled()
+                                            ->label('Email')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('pemohon_warga_blok')
+                                            ->label('Warga blok')
+                                            ->disabled()
+                                            ->maxLength(255),
+                                        Forms\Components\Textarea::make('pemohon_alamat')
+                                            ->label('Alamat')
+                                            ->disabled()
+                                            ->columnSpanFull(),
+                                    ])->columns(2),
 
-                Forms\Components\Select::make('form_id')
-                    ->label('Jenis Permohonan')
-                    ->relationship('form', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->reactive(), // Agar bisa mendeteksi perubahan langsung di form
-
-                Forms\Components\Section::make('Cetak Formulir')
-                    ->schema([
-                        Forms\Components\Actions::make([
-                            Forms\Components\Actions\Action::make('view_form')
-                                ->label('View Form')
-                                ->url(fn ($get) => route('file.viewForm', ['id' => $get('id')]))
-                                // ->url(fn ($get) => Storage::url($get('form_file_path')))
-                                ->openUrlInNewTab(),
-    
-                            Forms\Components\Actions\Action::make('view_form')
-                                ->label('Download')
-                                ->color('success')
-                                ->url(fn ($get) => route('file.downloadForm', ['id' => $get('id')]))
-                                ->openUrlInNewTab(false),
-                        ]),
-                    ]),
-
-                Forms\Components\Section::make('Dokumen yang Diupload')
-                    ->schema(function (Forms\Get $get) {
-                        $formId = $get('form_id');
-                        if (!$formId) return [];
-                        $requestId = $get('id');
-                        $isViewMode = !is_null($get('id')); // Cek apakah dalam mode View/Edit
-
-                        // Ambil semua list upload yang berkaitan dengan form
-                        $listUploads = ListUploadForm::where('form_id', $formId)
-                            ->select(['id', 'name', 'upload_type', 'is_required']) // Pilih hanya kolom tertentu
-                            ->get();
-
-                        // Ambil semua file yang sudah diupload sekaligus, lalu index berdasarkan list_upload_form_id
-                        $existingFiles = UploadFile::whereIn('request_id', [$requestId])
-                            ->select(['file_path', 'id', 'list_upload_form_id']) // Pilih hanya kolom tertentu
-                            ->get()
-                            ->keyBy('list_upload_form_id'); // Gunakan keyBy agar pencarian lebih cepat
+                                Forms\Components\Section::make('Detail')
+                                    ->schema([
+                                        Forms\Components\Select::make('form_id')
+                                            ->label('Jenis Permohonan')
+                                            ->relationship('form', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->disabled()
+                                            ->reactive(), // Agar bisa mendeteksi perubahan langsung di form
+                                        Forms\Components\Select::make('request_status_id')
+                                            ->label('Tahap Permohonan')
+                                            ->relationship('requestStatus', 'name')
+                                            ->searchable()
+                                            ->disabled()
+                                            ->preload(),
+                                    ])->columns(2),
 
 
-                        return $listUploads->map(function ($upload) use ($existingFiles, $isViewMode) {
-                            $existingFile = $existingFiles->get($upload->id); // Mengambil data dari koleksi, bukan query baru
-
-                            if ($isViewMode) {
-                                if ($existingFile) {
-                                    $filePath = Storage::url($existingFile->file_path);
-
-                                    return [
+                                Forms\Components\Section::make('Cetak Formulir')
+                                    ->schema([
                                         Forms\Components\Actions::make([
-                                            Forms\Components\Actions\Action::make('download_' . $upload->id)
-                                                ->label('View ' . $upload->name)
-                                                ->url(route('file.view', ['id' => $existingFile->id]))
-                                                // ->url($filePath)
-                                                // ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+                                            Forms\Components\Actions\Action::make('view_form')
+                                                ->label('View Form')
+                                                ->url(fn($get) => route('file.viewForm', ['id' => $get('id')]))
+                                                // ->url(fn ($get) => Storage::url($get('form_file_path')))
                                                 ->openUrlInNewTab(),
-                                            Forms\Components\Actions\Action::make('download_' . $upload->id)
+
+                                            Forms\Components\Actions\Action::make('view_form')
                                                 ->label('Download')
                                                 ->color('success')
-                                                ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+                                                ->url(fn($get) => route('file.downloadForm', ['id' => $get('id')]))
                                                 ->openUrlInNewTab(false),
                                         ]),
+                                    ]),
+
+                                Forms\Components\Section::make('Dokumen yang Diupload')
+                                    ->schema(function (Forms\Get $get) {
+                                        $formId = $get('form_id');
+                                        if (!$formId) return [];
+                                        $requestId = $get('id');
+                                        $isViewMode = !is_null($get('id')); // Cek apakah dalam mode View/Edit
+
+                                        // Ambil semua list upload yang berkaitan dengan form
+                                        $listUploads = ListUploadForm::where('form_id', $formId)
+                                            ->select(['id', 'name', 'upload_type', 'is_required']) // Pilih hanya kolom tertentu
+                                            ->get();
+
+                                        // Ambil semua file yang sudah diupload sekaligus, lalu index berdasarkan list_upload_form_id
+                                        $existingFiles = UploadFile::whereIn('request_id', [$requestId])
+                                            ->select(['file_path', 'id', 'list_upload_form_id']) // Pilih hanya kolom tertentu
+                                            ->get()
+                                            ->keyBy('list_upload_form_id'); // Gunakan keyBy agar pencarian lebih cepat
 
 
-                                    ];
-                                } else {
-                                    return Forms\Components\Placeholder::make('no_file_' . $upload->id)
-                                        ->label($upload->name)
-                                        ->content('Tidak ada file yang diupload.');
-                                }
-                            }
+                                        return $listUploads->map(function ($upload) use ($existingFiles, $isViewMode) {
+                                            $existingFile = $existingFiles->get($upload->id); // Mengambil data dari koleksi, bukan query baru
 
-                            // Jika dalam mode Create, tampilkan input untuk upload
-                            return Forms\Components\FileUpload::make('file_' . $upload->id)
-                                ->label($upload->name)
-                                ->directory('uploads/form_permohonan')
-                                ->acceptedFileTypes($upload->upload_type === 'pdf' ? ['application/pdf'] : ['image/*'])
-                                ->maxSize(2048) // 2MB
-                                ->required($upload->is_required === true ? true : false);
-                        })->flatten()->toArray(); // Pakai flatten() agar array tidak bersarang
-                    })
-                    ->hidden(fn($get) => !$get('form_id')),
+                                            if ($isViewMode) {
+                                                if ($existingFile) {
+                                                    $filePath = Storage::url($existingFile->file_path);
 
-                // Forms\Components\TextInput::make('user_id')
-                //     ->required()
-                //     ->numeric(),
+                                                    return [
+                                                        Forms\Components\Actions::make([
+                                                            Forms\Components\Actions\Action::make('download_' . $upload->id)
+                                                                ->label('View ' . $upload->name)
+                                                                ->url(route('file.view', ['id' => $existingFile->id]))
+                                                                // ->url($filePath)
+                                                                // ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+                                                                ->openUrlInNewTab(),
+                                                            Forms\Components\Actions\Action::make('download_' . $upload->id)
+                                                                ->label('Download')
+                                                                ->color('success')
+                                                                ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+                                                                ->openUrlInNewTab(false),
+                                                        ]),
 
-                Forms\Components\Select::make('request_status_id')
-                    ->label('Jenis Permohonan')
-                    ->relationship('requestStatus', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
+
+                                                    ];
+                                                } else {
+                                                    return Forms\Components\Placeholder::make('no_file_' . $upload->id)
+                                                        ->label($upload->name)
+                                                        ->content('Tidak ada file yang diupload.');
+                                                }
+                                            }
+
+                                            // Jika dalam mode Create, tampilkan input untuk upload
+                                            return Forms\Components\FileUpload::make('file_' . $upload->id)
+                                                ->label($upload->name)
+                                                ->directory('uploads/form_permohonan')
+                                                ->acceptedFileTypes($upload->upload_type === 'pdf' ? ['application/pdf'] : ['image/*'])
+                                                ->maxSize(2048); // 2MB
+                                        })->flatten()->toArray(); // Pakai flatten() agar array tidak bersarang
+                                    })
+                                    ->hidden(fn($get) => !$get('form_id')),
+
+                            ])->columnSpan(4),  // supaya kolom ini lebar
+
+                        // Kolom kanan - opsi/status
+                        Forms\Components\Section::make('Status & Pengaturan')
+                            ->schema([
+                                Forms\Components\ToggleButtons::make('verification_status_id')
+                                    ->label('Status Permohonan')
+                                    ->options(VerificationStatus::pluck('name', 'id'))
+                                    ->colors(
+                                        VerificationStatus::all()->mapWithKeys(function ($status) {
+                                            return [$status->id => match ($status->name) {
+                                                'Disetujui' => 'success',
+                                                'Ditolak'   => 'danger',
+                                                default     => 'gray',
+                                            }];
+                                        })
+                                    )
+                                    ->inline()
+                                    ->required(),
+
+                                Forms\Components\Textarea::make('keterangan')
+                                    ->label('Keterangan')
+                                    ->placeholder('Tambahkan catatan jika diperlukan'),
+                            ])->columnSpan(2),  // tetap kecil di kanan
+                    ])
+                    ->columns(6) // dua kolom mulai dari layar medium
             ]);
+
+        // ->schema([
+        //     Forms\Components\Section::make('Pemohon ')
+        //         ->description('Data diri pemohon')
+        //         ->schema([
+        //             Forms\Components\TextInput::make('pemohon_nama')
+        //                 ->label('Nama')
+        //                 ->required()
+        //                 ->maxLength(255),
+        //             Forms\Components\TextInput::make('pemohon_hp_telepon')
+        //                 ->tel()
+        //                 ->label('No Hp/telepon')
+        //                 ->required()
+        //                 ->maxLength(255),
+        //             Forms\Components\TextInput::make('pemohon_email')
+        //                 ->email()
+        //                 ->label('Email')
+        //                 ->required()
+        //                 ->maxLength(255),
+        //             Forms\Components\TextInput::make('pemohon_warga_blok')
+        //                 ->label('Warga blok')
+        //                 ->required()
+        //                 ->maxLength(255),
+        //             Forms\Components\Textarea::make('pemohon_alamat')
+        //                 ->label('Alamat')
+        //                 ->required()
+        //                 ->columnSpanFull(),
+        //         ])
+        //         ->columns(2),
+
+        //     Forms\Components\Select::make('form_id')
+        //         ->label('Jenis Permohonan')
+        //         ->relationship('form', 'name')
+        //         ->searchable()
+        //         ->preload()
+        //         ->required()
+        //         ->reactive(), // Agar bisa mendeteksi perubahan langsung di form
+
+        //     Forms\Components\Section::make('Cetak Formulir')
+        //         ->schema([
+        //             Forms\Components\Actions::make([
+        //                 Forms\Components\Actions\Action::make('view_form')
+        //                     ->label('View Form')
+        //                     ->url(fn ($get) => route('file.viewForm', ['id' => $get('id')]))
+        //                     // ->url(fn ($get) => Storage::url($get('form_file_path')))
+        //                     ->openUrlInNewTab(),
+
+        //                 Forms\Components\Actions\Action::make('view_form')
+        //                     ->label('Download')
+        //                     ->color('success')
+        //                     ->url(fn ($get) => route('file.downloadForm', ['id' => $get('id')]))
+        //                     ->openUrlInNewTab(false),
+        //             ]),
+        //         ]),
+
+        //     Forms\Components\Section::make('Dokumen yang Diupload')
+        //         ->schema(function (Forms\Get $get) {
+        //             $formId = $get('form_id');
+        //             if (!$formId) return [];
+        //             $requestId = $get('id');
+        //             $isViewMode = !is_null($get('id')); // Cek apakah dalam mode View/Edit
+
+        //             // Ambil semua list upload yang berkaitan dengan form
+        //             $listUploads = ListUploadForm::where('form_id', $formId)
+        //                 ->select(['id', 'name', 'upload_type', 'is_required']) // Pilih hanya kolom tertentu
+        //                 ->get();
+
+        //             // Ambil semua file yang sudah diupload sekaligus, lalu index berdasarkan list_upload_form_id
+        //             $existingFiles = UploadFile::whereIn('request_id', [$requestId])
+        //                 ->select(['file_path', 'id', 'list_upload_form_id']) // Pilih hanya kolom tertentu
+        //                 ->get()
+        //                 ->keyBy('list_upload_form_id'); // Gunakan keyBy agar pencarian lebih cepat
+
+
+        //             return $listUploads->map(function ($upload) use ($existingFiles, $isViewMode) {
+        //                 $existingFile = $existingFiles->get($upload->id); // Mengambil data dari koleksi, bukan query baru
+
+        //                 if ($isViewMode) {
+        //                     if ($existingFile) {
+        //                         $filePath = Storage::url($existingFile->file_path);
+
+        //                         return [
+        //                             Forms\Components\Actions::make([
+        //                                 Forms\Components\Actions\Action::make('download_' . $upload->id)
+        //                                     ->label('View ' . $upload->name)
+        //                                     ->url(route('file.view', ['id' => $existingFile->id]))
+        //                                     // ->url($filePath)
+        //                                     // ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+        //                                     ->openUrlInNewTab(),
+        //                                 Forms\Components\Actions\Action::make('download_' . $upload->id)
+        //                                     ->label('Download')
+        //                                     ->color('success')
+        //                                     ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+        //                                     ->openUrlInNewTab(false),
+        //                             ]),
+
+
+        //                         ];
+        //                     } else {
+        //                         return Forms\Components\Placeholder::make('no_file_' . $upload->id)
+        //                             ->label($upload->name)
+        //                             ->content('Tidak ada file yang diupload.');
+        //                     }
+        //                 }
+
+        //                 // Jika dalam mode Create, tampilkan input untuk upload
+        //                 return Forms\Components\FileUpload::make('file_' . $upload->id)
+        //                     ->label($upload->name)
+        //                     ->directory('uploads/form_permohonan')
+        //                     ->acceptedFileTypes($upload->upload_type === 'pdf' ? ['application/pdf'] : ['image/*'])
+        //                     ->maxSize(2048) // 2MB
+        //                     ->required($upload->is_required === true ? true : false);
+        //             })->flatten()->toArray(); // Pakai flatten() agar array tidak bersarang
+        //         })
+        //         ->hidden(fn($get) => !$get('form_id')),
+
+        //     // Forms\Components\TextInput::make('user_id')
+        //     //     ->required()
+        //     //     ->numeric(),
+
+        //     Forms\Components\Select::make('request_status_id')
+        //         ->label('Jenis Permohonan')
+        //         ->relationship('requestStatus', 'name')
+        //         ->searchable()
+        //         ->preload()
+        //         ->required(),
+        // ]);
     }
 
     // public static function getEloquentQuery(): Builder
@@ -277,7 +432,7 @@ class VerificationResource extends Resource
                 //     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('form.name')
                     ->label('Jenis')
-                    ->numeric()
+                    ->numeric()->wrap()
                     ->sortable(),
                 // Tables\Columns\TextColumn::make('requestStatus.name')
                 //     ->numeric()
@@ -287,12 +442,14 @@ class VerificationResource extends Resource
                     ->label('Tanggal Pengajuan')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                // ->toggleable(isToggledHiddenByDefault: true)
+                ,
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc') // Mengurutkan berdasarkan tanggal terbaru
             ->filters([
                 SelectFilter::make('form')
                     ->relationship('form', 'name')
@@ -334,92 +491,92 @@ class VerificationResource extends Resource
             ])
             ->actions([
 
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()->label('Verifikasi')->size(ActionSize::Medium),
 
-                Tables\Actions\Action::make('approve')
-                    ->form([
-                        Forms\Components\ToggleButtons::make('verification_status_id')
-                            ->label('Status Permohonan')
-                            ->options(VerificationStatus::pluck('name', 'id'))
-                            ->colors(VerificationStatus::all()->mapWithKeys(function ($status) {
-                                return [$status->id => match ($status->name) {
-                                    'Disetujui' => 'success',
-                                    'Ditolak' => 'danger',
-                                    default => 'gray',
-                                }];
-                            }))
-                            ->inline()
-                            ->required(),
-                        Forms\Components\Textarea::make('keterangan')
-                            ->label('Keterangan')
-                            ->placeholder('Tambahkan catatan jika diperlukan'),
-                    ])
-                    ->action(function (array $data, Request $record) {
-                        // Simpan ke tabel `verifications`
-                        Verification::create([
-                            'request_id' => $record->id,
-                            'verification_status_id' => $data['verification_status_id'],
-                            'user_id' => auth()->user()->id,
-                            'notes' => $data['keterangan'],
-                            'approved_by' => auth()->user()->name,
-                        ]);
-                        $sendEmail = 'n';
-                        $verifName = VerificationStatus::where('id', $data['verification_status_id'])->pluck('name')->first();
-                        if ($verifName == 'Disetujui') {
-                            $role_id = auth()->user()->role_id;
-                            $verifikator = Role::with(['levelVerification' => fn($query) => $query->select('id', 'order')])
-                                ->where('id', $role_id)
-                                ->first();
-                            $levelValidator = $verifikator->levelVerification->order;
-                            $requestStatusUpdate = ($levelValidator == '1')
-                                ? RequestStatus::where('name', 'Diproses')->pluck('id')->first()
-                                : RequestStatus::where('name', 'Agenda')->pluck('id')->first();
-                            // if ($levelValidator == '2') $sendEmail = 'y';
-                            $sendEmail = 'n';
-                        } else {
-                            // DITOLAK
-                            $requestStatusUpdate = RequestStatus::where('name', $verifName)->pluck('id')->first();
-                            $sendEmail = 'y';
-                        }
-                        // Update status permohonan
-                        $record->update([
-                            'request_status_id' => $requestStatusUpdate,
-                        ]);
+                // Tables\Actions\Action::make('approve')
+                //     ->form([
+                //         Forms\Components\ToggleButtons::make('verification_status_id')
+                //             ->label('Status Permohonan')
+                //             ->options(VerificationStatus::pluck('name', 'id'))
+                //             ->colors(VerificationStatus::all()->mapWithKeys(function ($status) {
+                //                 return [$status->id => match ($status->name) {
+                //                     'Disetujui' => 'success',
+                //                     'Ditolak' => 'danger',
+                //                     default => 'gray',
+                //                 }];
+                //             }))
+                //             ->inline()
+                //             ->required(),
+                //         Forms\Components\Textarea::make('keterangan')
+                //             ->label('Keterangan')
+                //             ->placeholder('Tambahkan catatan jika diperlukan'),
+                //     ])
+                //     ->action(function (array $data, Request $record) {
+                //         // Simpan ke tabel `verifications`
+                //         Verification::create([
+                //             'request_id' => $record->id,
+                //             'verification_status_id' => $data['verification_status_id'],
+                //             'user_id' => auth()->user()->id,
+                //             'notes' => $data['keterangan'],
+                //             'approved_by' => auth()->user()->name,
+                //         ]);
+                //         $sendEmail = 'n';
+                //         $verifName = VerificationStatus::where('id', $data['verification_status_id'])->pluck('name')->first();
+                //         if ($verifName == 'Disetujui') {
+                //             $role_id = auth()->user()->role_id;
+                //             $verifikator = Role::with(['levelVerification' => fn($query) => $query->select('id', 'order')])
+                //                 ->where('id', $role_id)
+                //                 ->first();
+                //             $levelValidator = $verifikator->levelVerification->order;
+                //             $requestStatusUpdate = ($levelValidator == '1')
+                //                 ? RequestStatus::where('name', 'Diproses')->pluck('id')->first()
+                //                 : RequestStatus::where('name', 'Agenda')->pluck('id')->first();
+                //             // if ($levelValidator == '2') $sendEmail = 'y';
+                //             $sendEmail = 'n';
+                //         } else {
+                //             // DITOLAK
+                //             $requestStatusUpdate = RequestStatus::where('name', $verifName)->pluck('id')->first();
+                //             $sendEmail = 'y';
+                //         }
+                //         // Update status permohonan
+                //         $record->update([
+                //             'request_status_id' => $requestStatusUpdate,
+                //         ]);
 
-                        // buatlah ketika status req batal atau setuju saja.
-                        if ($sendEmail == 'y') {
-                            $JenisPermohonan = FormModel::where('id', $record->form_id)->value('name');
-                            $data = [
-                                'pemohon_nama' => $record->pemohon_nama,
-                                'pemohon_warga_blok' => $record->pemohon_warga_blok,
-                                'pemohon_alamat' => $record->pemohon_alamat,
-                                'form' => $JenisPermohonan,
-                                'status' => $verifName,
-                                'notes' => $data['keterangan'],
-                            ];
-                            Mail::to($record->pemohon_email)->send(new RequestStatusesMail($data));
+                //         // buatlah ketika status req batal atau setuju saja.
+                //         if ($sendEmail == 'y') {
+                //             $JenisPermohonan = FormModel::where('id', $record->form_id)->value('name');
+                //             $data = [
+                //                 'pemohon_nama' => $record->pemohon_nama,
+                //                 'pemohon_warga_blok' => $record->pemohon_warga_blok,
+                //                 'pemohon_alamat' => $record->pemohon_alamat,
+                //                 'form' => $JenisPermohonan,
+                //                 'status' => $verifName,
+                //                 'notes' => $data['keterangan'],
+                //             ];
+                //             Mail::to($record->pemohon_email)->send(new RequestStatusesMail($data));
 
-                            $fonnteService = new FonnteService();
-                            $message = "Detail Permohonan:\n";
-                            $message .= "Nama: $record->pemohon_nama\n";
-                            $message .= "Warga Blok/Pepanthan: $record->pemohon_warga_blok\n";
-                            $message .= "Jenis Permohonan: $JenisPermohonan\n";
-                            $message .= "Status: $verifName\n";
-                            $message .= "Keterangan: ".$data['keterangan']."\n";
-                            $message .= "\nThanks,\nAdmin Sekretariat GKJ Manahan Surakarta";
-                            $fonnteService->sendMessage($record->pemohon_hp_telepon, $message);
-                        }
-                    })
-                    ->label('Verifikasi')
-                    ->icon('heroicon-m-ellipsis-vertical')
-                    ->size(ActionSize::Medium)
-                    ->color('primary')
-                    ->button(),
+                //             $fonnteService = new FonnteService();
+                //             $message = "Detail Permohonan:\n";
+                //             $message .= "Nama: $record->pemohon_nama\n";
+                //             $message .= "Warga Blok/Pepanthan: $record->pemohon_warga_blok\n";
+                //             $message .= "Jenis Permohonan: $JenisPermohonan\n";
+                //             $message .= "Status: $verifName\n";
+                //             $message .= "Keterangan: " . $data['keterangan'] . "\n";
+                //             $message .= "\nThanks,\nAdmin Sekretariat GKJ Manahan Surakarta";
+                //             $fonnteService->sendMessage($record->pemohon_hp_telepon, $message);
+                //         }
+                //     })
+                //     ->label('Verifikasi')
+                //     ->icon('heroicon-m-ellipsis-vertical')
+                //     ->size(ActionSize::Medium)
+                //     ->color('primary')
+                //     ->button(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 
@@ -436,7 +593,7 @@ class VerificationResource extends Resource
             'index' => Pages\ListVerifications::route('/'),
             // 'create' => Pages\CreateVerification::route('/create'),
             // 'view' => Pages\ViewVerification::route('/{record}'),
-            // 'edit' => Pages\EditVerification::route('/{record}/edit'),
+            'edit' => Pages\EditVerification::route('/{record}/edit'),
         ];
     }
 

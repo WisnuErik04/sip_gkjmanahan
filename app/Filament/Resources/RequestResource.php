@@ -268,7 +268,7 @@ class RequestResource extends Resource
                 //     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('form.name')
                     ->label('Jenis')
-                    ->numeric()
+                    ->numeric()->wrap()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('requestStatus.name')
                     ->label('Status')
@@ -293,7 +293,8 @@ class RequestResource extends Resource
                     ->label('Tanggal Pengajuan')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    // ->toggleable(isToggledHiddenByDefault: true)
+                    ,
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
@@ -372,7 +373,7 @@ class RequestResource extends Resource
     {
         return [
             'index' => Pages\ListRequests::route('/'),
-            'create' => Pages\CreateRequest::route('/create'),
+            // 'create' => Pages\CreateRequest::route('/create'),
             // 'view' => Pages\ViewRequest::route('/{record}'),
             // 'edit' => Pages\EditRequest::route('/{record}/edit'),
         ];

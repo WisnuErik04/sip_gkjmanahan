@@ -115,11 +115,11 @@ class FormResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()->wrap(),
                 Tables\Columns\TextInputColumn::make('order')->label('Urutan')->sortable(),
                 Tables\Columns\ToggleColumn::make('is_active')->label('Aktif'),
                 Tables\Columns\TextColumn::make('listUploadForm.name')
-                    ->searchable(),
+                    ->searchable()->wrap(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -135,12 +135,14 @@ class FormResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn ($record) => ! in_array($record->id, [1, 2, 3, 4, 5, 6])) // sembunyikan tombol delete untuk form utama,
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make()
+                //     ->visible(fn ($record) => ! in_array($record->id, [1, 2, 3, 4, 5, 6])) // sembunyikan tombol delete untuk form utama,
+                // ]),
             ]);
     }
 

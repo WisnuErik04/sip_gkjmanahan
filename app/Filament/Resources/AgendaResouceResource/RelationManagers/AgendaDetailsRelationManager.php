@@ -133,7 +133,7 @@ class AgendaDetailsRelationManager extends RelationManager
             ->recordTitleAttribute('no_surat')
             ->columns([
                 // Tables\Columns\TextColumn::make('no_surat')->sortable(),
-                Tables\Columns\TextInputColumn::make('no_surat')->rules(['required', 'max:255'])->sortable(),
+                Tables\Columns\TextInputColumn::make('no_surat')->rules(['required', 'max:255'])->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('dari')
                     ->label('Dari / Tanggal Masuk')
                     ->formatStateUsing(fn($record) => "{$record->dari} / ". \Carbon\Carbon::parse($record->tanggal_masuk)->locale('id')->translatedFormat('d F Y'))

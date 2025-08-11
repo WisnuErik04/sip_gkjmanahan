@@ -15,6 +15,7 @@ use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Repeater;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,12 +31,12 @@ class FormPertanyaanRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                
+
                 TextInput::make('pertanyaan')
-                ->label('Pertanyaan')
-                ->required(),
+                    ->label('Pertanyaan')
+                    ->required(),
                 TextInput::make('placeholder'),
-                
+
                 Section::make()->schema([
                     Fieldset::make('Detail')
                         ->schema([
@@ -59,6 +60,7 @@ class FormPertanyaanRelationManager extends RelationManager
                                 ->label('Urutan')
                                 ->default(FormPertanyaan::where('form_id', $this->ownerRecord->id)->count() + 1 ?? 111)
                                 // ->default(1)
+                                ->disabled(fn ($record) => in_array($this->ownerRecord->id, [1, 2, 3, 4, 5, 6])) // menahan form utama
                                 ->numeric(),
 
                             Toggle::make('required')
@@ -75,18 +77,18 @@ class FormPertanyaanRelationManager extends RelationManager
                         ])
                         ->collapsed()
                         ->hidden(fn(Forms\Get $get) => !in_array($get('tipe_jawaban'), ['select', 'checkbox', 'radio']))
-                        // ->default([]) // Pastikan default adalah array kosong
-                        // ->afterStateHydrated(function ($state, Forms\Set $set) {
-                        //     // Pastikan data diubah menjadi array jika masih string JSON
-                        //     dd('asasasa');
-                        //     if (is_string($state)) {
-                        //         dd('asasasa');
-                        //         $set('opsi_jawaban', json_decode($state, true) ?? []);
-                        //     }
-                        // })
-                        // ->dehydrateStateUsing(fn ($state) => json_encode($state)) // Simpan sebagai JSON di database
-                        // ->mutateDehydratedStateUsing(fn ($state) => json_encode($state)) // Pastikan tetap JSON saat save
-                        ,
+                    // ->default([]) // Pastikan default adalah array kosong
+                    // ->afterStateHydrated(function ($state, Forms\Set $set) {
+                    //     // Pastikan data diubah menjadi array jika masih string JSON
+                    //     dd('asasasa');
+                    //     if (is_string($state)) {
+                    //         dd('asasasa');
+                    //         $set('opsi_jawaban', json_decode($state, true) ?? []);
+                    //     }
+                    // })
+                    // ->dehydrateStateUsing(fn ($state) => json_encode($state)) // Simpan sebagai JSON di database
+                    // ->mutateDehydratedStateUsing(fn ($state) => json_encode($state)) // Pastikan tetap JSON saat save
+                    ,
                 ])
             ]);
     }
@@ -96,7 +98,9 @@ class FormPertanyaanRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('pertanyaan')
             ->columns([
-                TextInputColumn::make('order')->label('Urutan')->sortable(),
+                TextInputColumn::make('order')->label('Urutan')->sortable()
+                    ->disabled(fn ($record) => in_array($this->ownerRecord->id, [1, 2, 3, 4, 5, 6])) // menahan form utama
+                ,
                 TextColumn::make('pertanyaan')->label('Pertanyaan')->searchable(),
                 TextColumn::make('tipe_jawaban')
                     ->label('Tipe Jawaban')
@@ -120,11 +124,15 @@ class FormPertanyaanRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->visible(fn ($record) => ! in_array($this->ownerRecord->id, [1, 2, 3, 4, 5, 6])) // sembunyikan tombol delete untuk form utama
+                ,
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn ($record) => ! in_array($this->ownerRecord->id, [1, 2, 3, 4, 5, 6])) // sembunyikan tombol delete untuk form utama
+                ,
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

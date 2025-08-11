@@ -108,136 +108,201 @@ class VerifAgendaResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-queue-list';
     protected static ?string $navigationGroup = 'Form Permohonan';
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('Pemohon ')
-                    ->description('Data diri pemohon')
+                Forms\Components\Grid::make()
                     ->schema([
-                        TextInput::make('pemohon_nama')
-                            ->label('Nama')
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('pemohon_hp_telepon')
-                            ->tel()
-                            ->label('No Hp/telepon')
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('pemohon_email')
-                            ->email()
-                            ->label('Email')
-                            ->required()
-                            ->maxLength(255),
-                        TextInput::make('pemohon_warga_blok')
-                            ->label('Warga Blok/ Pepanthan/ Komisi/ Panitia/ Tim')
-                            ->required()
-                            ->maxLength(255),
-                        Textarea::make('pemohon_alamat')
-                            ->label('Alamat')
-                            ->required()
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
+                        // Kolom kiri - form utama
+                        Forms\Components\Section::make('Data Permohonan')
+                            ->schema([
+                                Forms\Components\Section::make('Data diri pemohon')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('pemohon_nama')
+                                            ->label('Nama')
+                                            ->disabled()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('pemohon_hp_telepon')
+                                            ->tel()
+                                            ->disabled()
+                                            ->label('No Hp/telepon')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('pemohon_email')
+                                            ->email()
+                                            ->disabled()
+                                            ->label('Email')
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('pemohon_warga_blok')
+                                            ->label('Warga blok')
+                                            ->disabled()
+                                            ->maxLength(255),
+                                        Forms\Components\Textarea::make('pemohon_alamat')
+                                            ->label('Alamat')
+                                            ->disabled()
+                                            ->columnSpanFull(),
+                                    ])->columns(2),
 
-                Select::make('form_id')
-                    ->label('Jenis Permohonan')
-                    ->relationship('form', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->reactive(), // Agar bisa mendeteksi perubahan langsung di form
-
-                Forms\Components\Section::make('Cetak Formulir')
-                    ->schema([
-                        Forms\Components\Actions::make([
-                            Forms\Components\Actions\Action::make('view_form')
-                                ->label('View Form')
-                                ->url(fn ($get) => route('file.viewForm', ['id' => $get('id')]))
-                                // ->url(fn ($get) => Storage::url($get('form_file_path')))
-                                ->openUrlInNewTab(),
-    
-                            Forms\Components\Actions\Action::make('view_form')
-                                ->label('Download')
-                                ->color('success')
-                                ->url(fn ($get) => route('file.downloadForm', ['id' => $get('id')]))
-                                ->openUrlInNewTab(false),
-                        ]),
-                    ]),
-
-                Section::make('Dokumen yang Diupload')
-                    ->schema(function (Forms\Get $get) {
-                        $formId = $get('form_id');
-                        if (!$formId) return [];
-                        $requestId = $get('id');
-                        $isViewMode = !is_null($get('id')); // Cek apakah dalam mode View/Edit
-
-                        // Ambil semua list upload yang berkaitan dengan form
-                        $listUploads = ListUploadForm::where('form_id', $formId)
-                            ->select(['id', 'name', 'upload_type', 'is_required']) // Pilih hanya kolom tertentu
-                            ->get();
-
-                        // Ambil semua file yang sudah diupload sekaligus, lalu index berdasarkan list_upload_form_id
-                        $existingFiles = UploadFile::whereIn('request_id', [$requestId])
-                            ->select(['file_path', 'id', 'list_upload_form_id']) // Pilih hanya kolom tertentu
-                            ->get()
-                            ->keyBy('list_upload_form_id'); // Gunakan keyBy agar pencarian lebih cepat
+                                Forms\Components\Section::make('Detail')
+                                    ->schema([
+                                        Forms\Components\Select::make('form_id')
+                                            ->label('Jenis Permohonan')
+                                            ->relationship('form', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->disabled()
+                                            ->reactive(), // Agar bisa mendeteksi perubahan langsung di form
+                                        Forms\Components\Select::make('request_status_id')
+                                            ->label('Tahap Permohonan')
+                                            ->relationship('requestStatus', 'name')
+                                            ->searchable()
+                                            ->disabled()
+                                            ->preload(),
+                                    ])->columns(2),
 
 
-                        return $listUploads->map(function ($upload) use ($existingFiles, $isViewMode) {
-                            $existingFile = $existingFiles->get($upload->id); // Mengambil data dari koleksi, bukan query baru
-
-                            if ($isViewMode) {
-                                if ($existingFile) {
-                                    $filePath = Storage::url($existingFile->file_path);
-
-                                    return [
+                                Forms\Components\Section::make('Cetak Formulir')
+                                    ->schema([
                                         Forms\Components\Actions::make([
-                                            Forms\Components\Actions\Action::make('download_' . $upload->id)
-                                                ->label('View ' . $upload->name)
-                                                ->url(route('file.view', ['id' => $existingFile->id]))
-                                                // ->url($filePath)
-                                                // ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+                                            Forms\Components\Actions\Action::make('view_form')
+                                                ->label('View Form')
+                                                ->url(fn($get) => route('file.viewForm', ['id' => $get('id')]))
+                                                // ->url(fn ($get) => Storage::url($get('form_file_path')))
                                                 ->openUrlInNewTab(),
-                                            Forms\Components\Actions\Action::make('download_' . $upload->id)
+
+                                            Forms\Components\Actions\Action::make('view_form')
                                                 ->label('Download')
                                                 ->color('success')
-                                                ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+                                                ->url(fn($get) => route('file.downloadForm', ['id' => $get('id')]))
                                                 ->openUrlInNewTab(false),
                                         ]),
+                                    ]),
+
+                                Forms\Components\Section::make('Dokumen yang Diupload')
+                                    ->schema(function (Forms\Get $get) {
+                                        $formId = $get('form_id');
+                                        if (!$formId) return [];
+                                        $requestId = $get('id');
+                                        $isViewMode = !is_null($get('id')); // Cek apakah dalam mode View/Edit
+
+                                        // Ambil semua list upload yang berkaitan dengan form
+                                        $listUploads = ListUploadForm::where('form_id', $formId)
+                                            ->select(['id', 'name', 'upload_type', 'is_required']) // Pilih hanya kolom tertentu
+                                            ->get();
+
+                                        // Ambil semua file yang sudah diupload sekaligus, lalu index berdasarkan list_upload_form_id
+                                        $existingFiles = UploadFile::whereIn('request_id', [$requestId])
+                                            ->select(['file_path', 'id', 'list_upload_form_id']) // Pilih hanya kolom tertentu
+                                            ->get()
+                                            ->keyBy('list_upload_form_id'); // Gunakan keyBy agar pencarian lebih cepat
 
 
-                                    ];
-                                } else {
-                                    return Forms\Components\Placeholder::make('no_file_' . $upload->id)
-                                        ->label($upload->name)
-                                        ->content('Tidak ada file yang diupload.');
-                                }
-                            }
+                                        return $listUploads->map(function ($upload) use ($existingFiles, $isViewMode) {
+                                            $existingFile = $existingFiles->get($upload->id); // Mengambil data dari koleksi, bukan query baru
 
-                            // Jika dalam mode Create, tampilkan input untuk upload
-                            return Forms\Components\FileUpload::make('file_' . $upload->id)
-                                ->label($upload->name)
-                                ->directory('uploads/form_permohonan')
-                                ->acceptedFileTypes($upload->upload_type === 'pdf' ? ['application/pdf'] : ['image/*'])
-                                ->maxSize(2048) // 2MB
-                                ->required($upload->is_required === true ? true : false);
-                        })->flatten()->toArray(); // Pakai flatten() agar array tidak bersarang
-                    })
-                    ->hidden(fn($get) => !$get('form_id')),
+                                            if ($isViewMode) {
+                                                if ($existingFile) {
+                                                    $filePath = Storage::url($existingFile->file_path);
 
-                // Forms\Components\TextInput::make('user_id')
-                //     ->required()
-                //     ->numeric(),
+                                                    return [
+                                                        Forms\Components\Actions::make([
+                                                            Forms\Components\Actions\Action::make('download_' . $upload->id)
+                                                                ->label('View ' . $upload->name)
+                                                                ->url(route('file.view', ['id' => $existingFile->id]))
+                                                                // ->url($filePath)
+                                                                // ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+                                                                ->openUrlInNewTab(),
+                                                            Forms\Components\Actions\Action::make('download_' . $upload->id)
+                                                                ->label('Download')
+                                                                ->color('success')
+                                                                ->url(route('file.download', ['id' => $existingFile->id])) // Arahkan ke route
+                                                                ->openUrlInNewTab(false),
+                                                        ]),
 
-                Select::make('request_status_id')
-                    ->label('Jenis Permohonan')
-                    ->relationship('requestStatus', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
+
+                                                    ];
+                                                } else {
+                                                    return Forms\Components\Placeholder::make('no_file_' . $upload->id)
+                                                        ->label($upload->name)
+                                                        ->content('Tidak ada file yang diupload.');
+                                                }
+                                            }
+
+                                            // Jika dalam mode Create, tampilkan input untuk upload
+                                            return Forms\Components\FileUpload::make('file_' . $upload->id)
+                                                ->label($upload->name)
+                                                ->directory('uploads/form_permohonan')
+                                                ->acceptedFileTypes($upload->upload_type === 'pdf' ? ['application/pdf'] : ['image/*'])
+                                                ->maxSize(2048); // 2MB
+                                        })->flatten()->toArray(); // Pakai flatten() agar array tidak bersarang
+                                    })
+                                    ->hidden(fn($get) => !$get('form_id')),
+
+                            ])->columnSpan(2),  // supaya kolom ini lebar
+
+                        // Kolom kanan - opsi/status
+                        Forms\Components\Section::make('Agenda Rapat')
+                            ->schema([
+                                Forms\Components\Section::make('Informasi Surat')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('no_surat')
+                                            ->label('Nomor Surat')
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('dari')
+                                            ->label('Dari')
+                                            ->required(),
+
+                                        Forms\Components\DatePicker::make('tanggal_masuk')
+                                            ->label('Tanggal Masuk')
+                                            ->required(),
+                                    ])
+                                    ->columns(3),
+
+                                Forms\Components\Section::make('Detail Agenda')
+                                    ->schema([
+                                        Forms\Components\Select::make('agenda_id')
+                                            ->label('Agenda')
+                                            ->options(Agenda::orderBy('tgl_rapat', 'desc')->pluck('tgl_rapat', 'id'))
+                                            ->required()
+                                            ->searchable()
+                                            ->preload()
+                                            ->createOptionForm([
+                                                Forms\Components\DatePicker::make('tgl_rapat')->required(),
+                                            ])
+                                            ->createOptionUsing(fn($data) => Agenda::create(['tgl_rapat' => $data['tgl_rapat']])->id),
+
+                                        Forms\Components\Select::make('jenis_id')
+                                            ->label('Jenis Agenda')
+                                            ->options(AgendaJenis::pluck('name', 'id'))
+                                            ->required()
+                                            ->searchable()
+                                            ->preload(),
+
+                                        Forms\Components\Select::make('keterangan_id')
+                                            ->label('Keterangan Agenda')
+                                            ->options(AgendaKeterangan::pluck('name', 'id'))
+                                            ->required()
+                                            ->searchable()
+                                            ->preload(),
+                                    ])
+                                    ->columns(3),
+
+                                Forms\Components\Section::make('Keterangan Tambahan')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('perihal')
+                                            ->label('Perihal')
+                                            ->required(),
+
+                                        Forms\Components\Textarea::make('usulan_keputusan')
+                                            ->label('Usulan Keputusan')
+                                            ->nullable(),
+                                    ]),
+                            ])->columnSpan(4),  // tetap kecil di kanan
+                    ])
+                    ->columns(6) // dua kolom mulai dari layar medium
             ]);
     }
 
@@ -289,7 +354,7 @@ class VerifAgendaResource extends Resource
                 //     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('form.name')
                     ->label('Jenis')
-                    ->numeric()
+                    ->numeric()->wrap()
                     ->sortable(),
                 // Tables\Columns\TextColumn::make('requestStatus.name')
                 //     ->numeric()
@@ -299,12 +364,14 @@ class VerifAgendaResource extends Resource
                     ->label('Tanggal Pengajuan')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                // ->toggleable(isToggledHiddenByDefault: true)
+                ,
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc') // Mengurutkan berdasarkan tanggal terbaru
             ->filters([
                 SelectFilter::make('form')
                     ->relationship('form', 'name')
@@ -346,122 +413,124 @@ class VerifAgendaResource extends Resource
             ])
             ->actions([
 
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()->label('Agendakan')->size(ActionSize::Medium),
 
-                Tables\Actions\Action::make('agendakan')
-                    ->form([
-                        Section::make('Informasi Surat')
-                            ->schema([
-                                TextInput::make('no_surat')
-                                    ->label('Nomor Surat')
-                                    ->required(),
+                // Tables\Actions\Action::make('agendakan')
+                //     ->form([
+                //         Section::make('Informasi Surat')
+                //             ->schema([
+                //                 TextInput::make('no_surat')
+                //                     ->label('Nomor Surat')
+                //                     ->required(),
 
-                                TextInput::make('dari')
-                                    ->label('Dari')
-                                    ->default(fn($record) => $record->pemohon_nama)
-                                    ->required(),
-                                    
-                                DatePicker::make('tanggal_masuk')
-                                    ->label('Tanggal Masuk')
-                                    ->default(fn($record) => $record->created_at)
-                                    ->required(),
-                            ])
-                            ->columns(3),
+                //                 TextInput::make('dari')
+                //                     ->label('Dari')
+                //                     ->default(fn($record) => $record->pemohon_nama)
+                //                     ->required(),
 
-                        Section::make('Detail Agenda')
-                            ->schema([
-                                Select::make('agenda_id')
-                                    ->label('Agenda')
-                                    ->options(Agenda::pluck('tgl_rapat', 'id'))
-                                    ->required()
-                                    ->searchable()
-                                    ->preload()
-                                    ->createOptionForm([
-                                        DatePicker::make('tgl_rapat')->required(),
-                                    ])
-                                    ->createOptionUsing(fn($data) => Agenda::create(['tgl_rapat' => $data['tgl_rapat']])->id),
+                //                 DatePicker::make('tanggal_masuk')
+                //                     ->label('Tanggal Masuk')
+                //                     ->default(fn($record) => $record->created_at)
+                //                     ->required(),
+                //             ])
+                //             ->columns(3),
 
-                                Select::make('jenis_id')
-                                    ->label('Jenis Agenda')
-                                    ->options(AgendaJenis::pluck('name', 'id'))
-                                    ->required()
-                                    ->searchable()
-                                    ->default(fn($record) => 
-                                        AgendaJenis::where('name', 'Surat Dibahas')->value('id')
-                                    )                                    
-                                    ->preload(),
+                //         Section::make('Detail Agenda')
+                //             ->schema([
+                //                 Select::make('agenda_id')
+                //                     ->label('Agenda')
+                //                     ->options(Agenda::pluck('tgl_rapat', 'id'))
+                //                     ->required()
+                //                     ->searchable()
+                //                     ->preload()
+                //                     ->createOptionForm([
+                //                         DatePicker::make('tgl_rapat')->required(),
+                //                     ])
+                //                     ->createOptionUsing(fn($data) => Agenda::create(['tgl_rapat' => $data['tgl_rapat']])->id),
 
-                                Select::make('keterangan_id')
-                                    ->label('Keterangan Agenda')
-                                    ->options(AgendaKeterangan::pluck('name', 'id'))
-                                    ->required()
-                                    ->searchable()
-                                    ->default(fn($record) => 
-                                        AgendaKeterangan::where('name', 'Kew')->value('id')
-                                    )
-                                    ->preload(),
-                            ])
-                            ->columns(3),
+                //                 Select::make('jenis_id')
+                //                     ->label('Jenis Agenda')
+                //                     ->options(AgendaJenis::pluck('name', 'id'))
+                //                     ->required()
+                //                     ->searchable()
+                //                     ->default(
+                //                         fn($record) =>
+                //                         AgendaJenis::where('name', 'Surat Dibahas')->value('id')
+                //                     )
+                //                     ->preload(),
 
-                        Section::make('Keterangan Tambahan')
-                            ->schema([
-                                Textarea::make('perihal')
-                                    ->label('Perihal')
-                                    ->default(fn($record) => 'Permohonan '.$record->form->name. ', nama; '.$record->pemohon_nama)
-                                    ->required(),
+                //                 Select::make('keterangan_id')
+                //                     ->label('Keterangan Agenda')
+                //                     ->options(AgendaKeterangan::pluck('name', 'id'))
+                //                     ->required()
+                //                     ->searchable()
+                //                     ->default(
+                //                         fn($record) =>
+                //                         AgendaKeterangan::where('name', 'Kew')->value('id')
+                //                     )
+                //                     ->preload(),
+                //             ])
+                //             ->columns(3),
 
-                                Textarea::make('usulan_keputusan')
-                                    ->label('Usulan Keputusan')
-                                    ->nullable(),
-                            ]),
-                    ])
-                    ->action(function (array $data, Request $record) {
-                        // Simpan ke tabel `verifications`
-                        AgendaDetail::create([
-                            'request_id' => $record->id,
-                            'no_surat' => $data['no_surat'],
-                            'dari' => $data['dari'],
-                            'tanggal_masuk' => $data['tanggal_masuk'],
-                            'agenda_id' => $data['agenda_id'],
-                            'jenis_id' => $data['jenis_id'],
-                            'keterangan_id' => $data['keterangan_id'],
-                            'perihal' => $data['perihal'],
-                            'usulan_keputusan' => $data['usulan_keputusan'],
-                        ]);
-                       
-                        $record->update([
-                            'telah_dijadwalkan_sidang' => true,
-                        ]);
+                //         Section::make('Keterangan Tambahan')
+                //             ->schema([
+                //                 Textarea::make('perihal')
+                //                     ->label('Perihal')
+                //                     ->default(fn($record) => 'Permohonan ' . $record->form->name . ', nama; ' . $record->pemohon_nama)
+                //                     ->required(),
 
-                        $JenisPermohonan = FormModel::where('id', $record->form_id)->value('name');
-                        $notes = "Permohonan disetujui, menunggu hasil sidang pleno";
-                        $status = $record->requestStatus->name;
-                        // Kirim email
-                        $data = [
-                            'pemohon_nama' => $record->pemohon_nama,
-                            'pemohon_warga_blok' => $record->pemohon_warga_blok,
-                            'pemohon_alamat' => $record->pemohon_alamat,
-                            'form' => $JenisPermohonan,
-                            'status' => $status,
-                            'notes' => $notes,
-                        ];
-                        Mail::to($record->pemohon_email)->send(new RequestStatusesMail($data));
-                        
-                        $fonnteService = new FonnteService();
-                        $message = "Detail Permohonan:\n";
-                        $message .= "Nama: $record->pemohon_nama\n";
-                        $message .= "Warga Blok/Pepanthan: $record->pemohon_warga_blok\n";
-                        $message .= "Jenis Permohonan: $JenisPermohonan\n";
-                        $message .= "Status: $status\n";
-                        $message .= "Keterangan: ".$notes."\n";
-                        $message .= "\nTerima kasih,\nAdmin Sekretariat GKJ Manahan Surakarta";
-                        $fonnteService->sendMessage($record->pemohon_hp_telepon, $message);
-                    })
-                    ->label('Agendakan')
-                    ->icon('heroicon-m-ellipsis-vertical')
-                    ->size(ActionSize::Medium)
-                    ->color('primary')
-                    ->button(),
+                //                 Textarea::make('usulan_keputusan')
+                //                     ->label('Usulan Keputusan')
+                //                     ->nullable(),
+                //             ]),
+                //     ])
+                //     ->action(function (array $data, Request $record) {
+                //         // Simpan ke tabel `verifications`
+                //         AgendaDetail::create([
+                //             'request_id' => $record->id,
+                //             'no_surat' => $data['no_surat'],
+                //             'dari' => $data['dari'],
+                //             'tanggal_masuk' => $data['tanggal_masuk'],
+                //             'agenda_id' => $data['agenda_id'],
+                //             'jenis_id' => $data['jenis_id'],
+                //             'keterangan_id' => $data['keterangan_id'],
+                //             'perihal' => $data['perihal'],
+                //             'usulan_keputusan' => $data['usulan_keputusan'],
+                //         ]);
+
+                //         $record->update([
+                //             'telah_dijadwalkan_sidang' => true,
+                //         ]);
+
+                //         $JenisPermohonan = FormModel::where('id', $record->form_id)->value('name');
+                //         $notes = "Permohonan disetujui, menunggu hasil sidang pleno";
+                //         $status = $record->requestStatus->name;
+                //         // Kirim email
+                //         $data = [
+                //             'pemohon_nama' => $record->pemohon_nama,
+                //             'pemohon_warga_blok' => $record->pemohon_warga_blok,
+                //             'pemohon_alamat' => $record->pemohon_alamat,
+                //             'form' => $JenisPermohonan,
+                //             'status' => $status,
+                //             'notes' => $notes,
+                //         ];
+                //         Mail::to($record->pemohon_email)->send(new RequestStatusesMail($data));
+
+                //         $fonnteService = new FonnteService();
+                //         $message = "Detail Permohonan:\n";
+                //         $message .= "Nama: $record->pemohon_nama\n";
+                //         $message .= "Warga Blok/Pepanthan: $record->pemohon_warga_blok\n";
+                //         $message .= "Jenis Permohonan: $JenisPermohonan\n";
+                //         $message .= "Status: $status\n";
+                //         $message .= "Keterangan: " . $notes . "\n";
+                //         $message .= "\nTerima kasih,\nAdmin Sekretariat GKJ Manahan Surakarta";
+                //         $fonnteService->sendMessage($record->pemohon_hp_telepon, $message);
+                //     })
+                //     ->label('Agendakan')
+                //     ->icon('heroicon-m-ellipsis-vertical')
+                //     ->size(ActionSize::Medium)
+                //     ->color('primary')
+                //     ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -483,7 +552,7 @@ class VerifAgendaResource extends Resource
             'index' => Pages\ListVerifAgendas::route('/'),
             // 'create' => Pages\CreateVerifAgenda::route('/create'),
             // 'view' => Pages\ViewVerifAgenda::route('/{record}'),
-            // 'edit' => Pages\EditVerifAgenda::route('/{record}/edit'),
+            'edit' => Pages\EditVerifAgenda::route('/{record}/edit'),
         ];
     }
 
