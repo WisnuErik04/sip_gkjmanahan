@@ -247,7 +247,7 @@ class FormPermohonan extends Component
     {
         DB::beginTransaction(); // Mulai transaksi untuk mencegah error
 
-        // session()->forget('form_data');
+        session()->forget('form_data');
         try {
 
             $listUploads = ListUploadForm::where('form_id', $this->form_id)->get();
