@@ -231,7 +231,7 @@ class VerificationResource extends Resource
                             ])->columnSpan(4),  // supaya kolom ini lebar
 
                         // Kolom kanan - opsi/status
-                        Forms\Components\Section::make('Status & Pengaturan')
+                        Forms\Components\Section::make('Status  Verifikasi')
                             ->schema([
                                 Forms\Components\ToggleButtons::make('verification_status_id')
                                     ->label('Status Permohonan')
@@ -240,7 +240,7 @@ class VerificationResource extends Resource
                                         VerificationStatus::all()->mapWithKeys(function ($status) {
                                             return [$status->id => match ($status->name) {
                                                 'Disetujui' => 'success',
-                                                'Ditolak'   => 'danger',
+                                                'Tidak Disetujui'   => 'danger',
                                                 default     => 'gray',
                                             }];
                                         })

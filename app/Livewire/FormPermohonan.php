@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Spatie\LivewireFilepond\WithFilePond;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class FormPermohonan extends Component
 {
@@ -27,8 +28,10 @@ class FormPermohonan extends Component
     use WithFileUploads;
 
     public $pemohon_nama, $pemohon_hp_telepon, $pemohon_email, $pemohon_warga_blok, $pemohon_alamat;
+        public $tanggal;
     public $form_id, $listUploads, $pertanyaans = [];
     public $uploadedFiles = [];
+    public $existingUploads = [];
     // public $uploadedFilesa = [];
     public $answers = [];
     public $uploadProgress = [];
@@ -58,6 +61,13 @@ class FormPermohonan extends Component
         }
 
         if ($this->step === 3) {
+            // foreach ($this->uploadedFiles as $id => $file) {
+            //     // Pastikan file valid sebelum dipindahkan
+            //     if ($file instanceof TemporaryUploadedFile) {
+            //         // Pindahkan file dari temporary ke 'existing'
+            //         $this->existingUploads[$id] = $file;
+            //     }
+            // }
             $pertanyaans = FormPertanyaan::where('form_id', $this->form_id)->orderBy('order')->get();
             // $this->$pertanyaans = $pertanyaans;
             $rules = [];
@@ -78,6 +88,11 @@ class FormPermohonan extends Component
                             $rules[$fieldName] = 'nullable';
                             $messages[$fieldName . '.nullable'] = '';
                         }
+                        if ($pertanyaan->tipe_jawaban === 'date') {
+                            $rules[$fieldName] = ($pertanyaan->required ? 'required' : 'nullable') . '|date_format:d/m/Y';
+                            // $messages[$fieldName . '.date_format'] = $pertanyaan->pertanyaan . ' memiliki format tanggal yang salah (contoh: 21/03/1994).';
+                            $messages[$fieldName . '.date_format'] = $pertanyaan->pertanyaan . ' memiliki format tanggal yang salah (contoh: 21/03/1994).';
+                        }
                     }
                 }
                 if (!empty($rules)) {
@@ -86,19 +101,29 @@ class FormPermohonan extends Component
         }
 
         if ($this->step === 4) {
+            foreach ($this->uploadedFiles as $id => $file) {
+                // Pastikan file valid sebelum dipindahkan
+                if ($file instanceof TemporaryUploadedFile) {
+                    // Pindahkan file dari temporary ke 'existing'
+                    $this->existingUploads[$id] = $file;
+                }
+            }
             $listUploads = ListUploadForm::where('form_id', $this->form_id)->get();
             // $this->$listUploads = $listUploads;
             $messages = [];
             $rules = [];
 
             foreach ($listUploads as $upload) {
-                $fieldName = 'uploadedFiles.' . $upload->id;
+                $fieldName = 'existingUploads.' . $upload->id;
+                // $fieldName = 'uploadedFiles.' . $upload->id;
 
                 if ($upload->is_required) {
-                    $rules[$fieldName] = 'required|file|max:2048';
+                    $rules[$fieldName] = 'required|file|max:5120';
                     $messages[$fieldName . '.required'] = $upload->name . ' wajib diunggah.';
+                    $messages[$fieldName . '.max'] = 'File '. $upload->name . ' tidak boleh lebih dari 5MB.';
                 } else {
-                    $rules[$fieldName] = 'nullable|file|max:2048';
+                    $rules[$fieldName] = 'nullable|file|max:5120';
+                    $messages[$fieldName . '.max'] = 'File '. $upload->name . ' tidak boleh lebih dari 5MB.';
                 }
 
                 // Tentukan jenis file yang diperbolehkan
@@ -115,6 +140,12 @@ class FormPermohonan extends Component
             }
         }
         $this->step++;
+        if ($this->step == 4) {
+            // $this->emit('stepChanged');
+            // dd('qwqwqw');
+                $this->dispatch('resetFilepond');
+            };
+            $this->uploadedFiles = [];
     }
 
 
@@ -122,6 +153,17 @@ class FormPermohonan extends Component
     {
         $this->dispatch('step-changed');
         $this->step--;
+         foreach ($this->uploadedFiles as $id => $file) {
+                // Pastikan file valid sebelum dipindahkan
+                if ($file instanceof TemporaryUploadedFile) {
+                    // Pindahkan file dari temporary ke 'existing'
+                    $this->existingUploads[$id] = $file;
+                }
+            }
+        $this->uploadedFiles = [];
+        // if ($this->step == 4) {
+        //     $this->emit('stepChanged');
+        // };
     }
 
     public function updateProgress($event, $percentage)
@@ -201,7 +243,7 @@ class FormPermohonan extends Component
     //         'pemohon_alamat' => 'required|string',
     //         'form_id' => 'required|exists:forms,id',
     //         'uploadedFiles' => 'array',
-    //         'uploadedFiles.*' => 'required|file|max:2048',
+    //         'uploadedFiles.*' => 'required|file|max:5120',
     //     ]);
 
     //     //     dd('Validasi sukses');
@@ -260,19 +302,21 @@ class FormPermohonan extends Component
                 'pemohon_warga_blok' => 'nullable|string',
                 'pemohon_alamat' => 'required|string',
                 'form_id' => 'required|exists:forms,id',
-                'uploadedFiles' => 'array',
+                // 'uploadedFiles' => 'array',
+                'existingUploads' => 'array',
             ];
 
             $messages = [];
 
             foreach ($listUploads as $upload) {
-                $fieldName = 'uploadedFiles.' . $upload->id;
+                // $fieldName = 'uploadedFiles.' . $upload->id;
+                $fieldName = 'existingUploads.' . $upload->id;
 
                 if ($upload->is_required) {
-                    $rules[$fieldName] = 'required|file|max:2048';
+                    $rules[$fieldName] = 'required|file|max:5120';
                     $messages[$fieldName . '.required'] = $upload->name . ' wajib diunggah.';
                 } else {
-                    $rules[$fieldName] = 'nullable|file|max:2048';
+                    $rules[$fieldName] = 'nullable|file|max:5120';
                 }
 
                 // Tentukan jenis file yang diperbolehkan
@@ -320,7 +364,8 @@ class FormPermohonan extends Component
             ]);
 
             // Simpan file yang diunggah
-            foreach ($this->uploadedFiles as $uploadId => $file) {
+            // foreach ($this->uploadedFiles as $uploadId => $file) {
+            foreach ($this->existingUploads as $uploadId => $file) {
                 // $path = $file->store('uploads/form_permohonan', 'public');
                 $path = $file->store('uploads/form_permohonan');
                 $size = round($file->getSize() / 1024, 2); // Konversi ke KB
@@ -432,7 +477,8 @@ class FormPermohonan extends Component
             'pemohon_warga_blok' => 'Blok',
             'pemohon_alamat' => 'Alamat Lengkap',
             'form_id' => 'Form Permohonan',
-            'uploadedFiles.*' => 'File yang diunggah',
+            // 'uploadedFiles.*' => 'File yang diunggah',
+            'existingUploads.*' => 'File yang diunggah',
         ];
     }
 
@@ -447,8 +493,10 @@ class FormPermohonan extends Component
             'pemohon_alamat.required' => 'Alamat Lengkap harus diisi.',
             'form_id.required' => 'Form Permohonan harus dipilih.',
             'form_id.exists' => 'Form Permohonan tidak valid.',
-            'uploadedFiles.*.file' => 'File yang diunggah harus berupa file.',
-            'uploadedFiles.*.max' => 'File yang diunggah tidak boleh lebih dari 2MB.',
+            // 'uploadedFiles.*.file' => 'File yang diunggah harus berupa file.',
+            'existingUploads.*.file' => 'File yang diunggah harus berupa file.',
+            // 'uploadedFiles.*.max' => 'File yang diunggah tidak boleh lebih dari 5MB.',
+            'existingUploads.*.max' => 'File yang diunggah tidak boleh lebih dari 5MB.',
         ];
     }
 

@@ -69,7 +69,7 @@ class AgendaDetailsRelationManager extends RelationManager
 
                         Select::make('jenis_id')
                             ->label('Jenis Agenda')
-                            ->relationship('agendaJenis', 'name')
+                            ->relationship('agendaJenis', 'name', fn(Builder $query) => $query->orderBy('id', 'asc'))
                             ->required()
                             ->searchable()
                             ->preload(),
@@ -107,9 +107,9 @@ class AgendaDetailsRelationManager extends RelationManager
         $jenisList = AgendaJenis::all();
 
         $counts = AgendaDetail::where('agenda_id', $parentId)
-        ->selectRaw('jenis_id, COUNT(*) as total')
-        ->groupBy('jenis_id')
-        ->pluck('total', 'jenis_id');
+            ->selectRaw('jenis_id, COUNT(*) as total')
+            ->groupBy('jenis_id')
+            ->pluck('total', 'jenis_id');
 
         foreach ($jenisList as $jenis) {
             $tabs[Str::slug($jenis->name)] = Tab::make()
@@ -128,7 +128,7 @@ class AgendaDetailsRelationManager extends RelationManager
 
     public function table(Table $table): Table
     {
-   
+
         return $table
             ->recordTitleAttribute('no_surat')
             ->columns([
@@ -136,7 +136,7 @@ class AgendaDetailsRelationManager extends RelationManager
                 Tables\Columns\TextInputColumn::make('no_surat')->rules(['required', 'max:255'])->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('dari')
                     ->label('Dari / Tanggal Masuk')
-                    ->formatStateUsing(fn($record) => "{$record->dari} / ". \Carbon\Carbon::parse($record->tanggal_masuk)->locale('id')->translatedFormat('d F Y'))
+                    ->formatStateUsing(fn($record) => "{$record->dari} / " . \Carbon\Carbon::parse($record->tanggal_masuk)->locale('id')->translatedFormat('d F Y'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('perihal')->searchable()->limit(50),
                 Tables\Columns\TextColumn::make('usulan_keputusan')->label('Usulan Keputusan'),
@@ -186,7 +186,7 @@ class AgendaDetailsRelationManager extends RelationManager
 
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
-      
+
                 Action::make('Export PDF')
                     ->label('PDF')
                     ->icon('heroicon-o-arrow-down-tray')
@@ -195,7 +195,7 @@ class AgendaDetailsRelationManager extends RelationManager
 
                 Action::make('Export Excel')
                     ->label('Excel')
-                    ->url(fn ($record) => route('laporan.agenda.excel', $this->ownerRecord->id))
+                    ->url(fn($record) => route('laporan.agenda.excel', $this->ownerRecord->id))
                     ->openUrlInNewTab()
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success'),
@@ -218,19 +218,22 @@ class AgendaDetailsRelationManager extends RelationManager
 
     public function exportToPdf()
     {
-        
+
         $parentId = $this->ownerRecord->id;
         $agenda = Agenda::findOrFail($parentId);
         $records = AgendaDetail::where('agenda_id', $parentId)
-                    ->get()
-                    ->groupBy('agendaJenis.name');
+            ->get()
+            ->sortBy(function ($agendaDetail) { // Di sini $agendaDetail muncul
+                return optional($agendaDetail->agendaJenis)->id;
+            })
+            ->groupBy('agendaJenis.name');
 
         // dd($records);
         $pdf = Pdf::loadView('pdf.agenda_details', compact('agenda', 'records'));
 
         return response()->streamDownload(
             fn() => print($pdf->output()),
-            'Agenda_rapat_' . Carbon::parse($agenda->tgl_rapat)->format('Y-m-d'). '.pdf'
+            'Agenda_rapat_' . Carbon::parse($agenda->tgl_rapat)->format('Y-m-d') . '.pdf'
         );
     }
 }

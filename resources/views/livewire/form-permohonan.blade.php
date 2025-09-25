@@ -196,6 +196,7 @@
                         }
                     </script>
 
+
                     <div class="sm:col-span-2">
                         <label for="pemohon_email" class="block text-sm/6 font-medium text-gray-900">Email </label>
                         <div class="mt-2">
@@ -291,28 +292,41 @@
                                 </div>
                             @else
                                 <div class="sm:col-span-1">
-                                    <label class="block text-sm/6 font-medium text-gray-900">{{ $pertanyaan->pertanyaan }}
+                                    <label
+                                        class="block text-sm/6 font-medium text-gray-900">{{ $pertanyaan->pertanyaan }}
+                                        @if ($pertanyaan->tipe_jawaban === 'date')
+                                            <span class="text-gray-500"> (Format dd/mm/yyyy) </span>
+                                        @endif
                                         @if ($pertanyaan->required)
                                             <span class="text-red-500">*</span>
                                         @endif
                                     </label>
-                {{-- <td>: {{ \Carbon\Carbon::parse('2020-04-04')->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse('2020-04-04')->age }} / {{ '2025-04-04' }} </td> --}}
+                                    {{-- <td>: {{ \Carbon\Carbon::parse('2020-04-04')->locale('id')->translatedFormat('d F Y') }} / {{ \Carbon\Carbon::parse('2020-04-04')->age }} / {{ '2025-04-04' }} </td> --}}
 
                                     <div class="mt-2">
                                         @if ($pertanyaan->tipe_jawaban === 'text')
-                                            <input placeholder="{{ $pertanyaan->placeholder }}" type="text"
-                                                wire:model="answers.{{ $pertanyaan->order }}"
+                                            <input
+                                                placeholder="{{ $pertanyaan->placeholder == null ? $pertanyaan->placeholder : '' }}"
+                                                type="text" wire:model="answers.{{ $pertanyaan->order }}"
                                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6">
                                         @elseif ($pertanyaan->tipe_jawaban === 'date')
-                                            <input placeholder="{{ $pertanyaan->placeholder }}" type="date"
-                                                wire:model="answers.{{ $pertanyaan->order }}"
+                                            <input
+                                                placeholder="{{ $pertanyaan->placeholder == null ? $pertanyaan->placeholder . ', ' : '' }} Cth. 21/03/1994"
+                                                oninput="validateDateInput(this, {{ $pertanyaan->order }})"
+                                                x-mask="99/99/9999" wire:model="answers.{{ $pertanyaan->order }}"
                                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6">
-                                        @elseif ($pertanyaan->tipe_jawaban === 'time')
-                                            <input placeholder="{{ $pertanyaan->placeholder }}" type="time"
+
+                                            {{-- <input placeholder="{{ ($pertanyaan->placeholder==null)? $pertanyaan->placeholder: '' }}" type="date"
                                                 wire:model="answers.{{ $pertanyaan->order }}"
+                                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6"> --}}
+                                        @elseif ($pertanyaan->tipe_jawaban === 'time')
+                                            <input
+                                                placeholder="{{ $pertanyaan->placeholder == null ? $pertanyaan->placeholder : '' }}"
+                                                type="time" wire:model="answers.{{ $pertanyaan->order }}"
                                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6">
                                         @elseif ($pertanyaan->tipe_jawaban === 'textarea')
-                                            <textarea placeholder="{{ $pertanyaan->placeholder }}" wire:model="answers.{{ $pertanyaan->order }}"
+                                            <textarea placeholder="{{ $pertanyaan->placeholder == null ? $pertanyaan->placeholder : '' }}"
+                                                wire:model="answers.{{ $pertanyaan->order }}"
                                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm/6">
                                                     </textarea>
                                         @elseif (in_array($pertanyaan->tipe_jawaban, ['select', 'checkbox', 'radio']))
@@ -351,6 +365,9 @@
                                                 @endforeach
                                             @endif
                                         @endif
+                                        @if ($pertanyaan->tipe_jawaban === 'date')
+                                            <p id="date-error-{{ $pertanyaan->order }}" class="text-red-500"></p>
+                                        @endif
 
                                         @error('answers.' . $pertanyaan->order)
                                             <p class="text-red-500">{{ $message }}</p>
@@ -359,19 +376,46 @@
                                 </div>
                             @endif
                         @endforeach
+
                     @endif
                 </div>
 
 
             </div>
         @endif
+        <script>
+            function validateDateInput(input, id) {
+                console.log(input);
 
+                let value = input.value;
+                console.log(value);
+                let errorText = document.getElementById('date-error-' + id);
+
+                const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+
+                const bagianTanggal = value.split('/');
+                const hari = parseInt(bagianTanggal[0], 10);
+                const bulan = parseInt(bagianTanggal[1], 10) - 1; // Bulan dalam JavaScript dimulai dari 0 (Januari = 0)
+                const tahun = parseInt(bagianTanggal[2], 10);
+
+                const d = new Date(tahun, bulan, hari);
+
+                const valid = d.getFullYear() === tahun && d.getMonth() === bulan && d.getDate() === hari;
+                console.log(value.length);
+
+                if (value.length == 10 && (!regex.test(value) || valid == false)) {
+                    errorText.textContent = "Tanggal tidak valid";
+                } else {
+                    errorText.textContent = "";
+                }
+            }
+        </script>
         <!-- Unggah Dokumen -->
         @if ($currentStep === 4)
             <div class="p-4 rounded-lg shadow-md mt-5 bg-white">
                 <h3 class="text-lg font-semibold text-center">Unggah Dokumen</h3>
                 {{-- <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2" wire:ignore> --}}
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2" >
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
                     @if (!isset($listUploads) || count($listUploads) === 0)
                         <div class="sm:col-span-3">
                             <div class="max-w-xl mx-auto text-center">
@@ -381,31 +425,39 @@
                         </div>
                     @else
                         @foreach ($listUploads as $upload)
-                            <div class="sm:col-span-1">
+                            <div class="sm:col-span-1" wire:key="upload-{{ $upload->id }}">
                                 <label class="block text-gray-700 font-medium">{{ $upload->name }}
                                     @if ($upload->is_required)
                                         <span class="text-red-500">*</span>
                                     @endif
                                 </label>
 
-                                {{-- <x-filepond::upload class="filepond" wire:model="uploadedFiles.{{ $upload->id }}"
-                                    acceptedFileTypes="{{ $upload->upload_type === 'pdf' ? 'application/pdf' : 'image/*' }}"
-                                    max-file-size="2MB" /> --}}
+                                <x-filepond::upload class="filepond" 
+                                    wire:model="uploadedFiles.{{ $upload->id }}"
+                                    :existing-files="null"
+                                    {{-- acceptedFileTypes="{{ $upload->upload_type === 'pdf' ? 'application/pdf' : 'image/*' }}" --}}
+                                    acceptedFileTypes="{{ $upload->upload_type === 'pdf' ? 'application/pdf' : ($upload->upload_type === 'both' ? 'application/pdf,image/*' : 'image/*') }}"
+                                    max-file-size="5MB" />
 
                                 @php
                                     $upload_id = $upload->id;
                                 @endphp
-                                <input type="file" wire:model="uploadedFiles.{{ $upload_id }}"
+
+                              
+                                {{-- <input type="file" wire:model="uploadedFiles.{{ $upload_id }}"
+                                    onchange="validateFileSize(this, {{ $upload_id }})"
                                     class="block w-full border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
                                     file:bg-gray-50 file:border-0 file:me-4 file:py-3 file:px-4"
-                                    accept="{{ $upload->upload_type === 'pdf' ? 'application/pdf' : 'image/*' }}">
-                                <p class="text-xs text-gray-500">
-                                    Format: {{ $upload->upload_type === 'pdf' ? 'PDF' : 'JPG, JPEG, PNG' }}, Maks:
-                                    2MB
-                                </p>
+                                    accept="{{ $upload->upload_type === 'pdf' ? 'application/pdf' : 'image/*' }}"> --}}
 
-                                <!-- Spinner saat upload -->
-                                <div wire:loading wire:target="uploadedFiles.{{ $upload_id }}"
+
+                                <p class="text-xs text-gray-500">
+                                    Format: {{ $upload->upload_type === 'pdf' ? 'PDF' : ($upload->upload_type === 'both' ? 'PDF, JPG, JPEG, PNG' : 'JPG, JPEG, PNG') }}, Maks:
+                                    5MB
+                                </p>
+                                <p id="size-error-{{ $upload_id }}" class="text-sm text-red-600 mt-1"></p>
+
+                                {{-- <div wire:loading wire:target="uploadedFiles.{{ $upload_id }}"
                                     class="w-full grid gap-1 mt-4">
                                     <div class="flex items-center gap-2">
                                         <svg class="animate-spin h-5 w-5 text-indigo-600"
@@ -417,9 +469,31 @@
                                         </svg>
                                         <span class="text-sm text-gray-600">Unggah file...</span>
                                     </div>
-                                </div>
-                                @if ($uploadedFiles[$upload_id] ?? false)
-                                    {{-- <pre>{{ dd($uploadedFiles) }}</pre> --}}
+                                </div> --}}
+
+                                {{-- <div id="size-error-{{ $upload_id }}" class="w-full grid gap-1 mt-4 hidden">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                                            </svg>
+
+
+                                            <div class="grid gap-1">
+                                                <h4 class="text-sm text-red-600 font-normal leading-snug">Ukuran file
+                                                    terlalu besar!</h4>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div> --}}
+
+                                @if ($existingUploads[$upload_id] ?? false)
                                     <div wire:loading.remove wire:target="uploadedFiles.{{ $upload_id }}"
                                         class="w-full grid gap-1 mt-4">
                                         <div class="flex items-center justify-between gap-2">
@@ -439,35 +513,27 @@
                                                         fill="none" xmlns="http://www.w3.org/2000/svg">
                                                         <path id="icon"
                                                             d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                                                            stroke="#4F46E5" stroke-width="1" stroke-linecap="round" />
+                                                            stroke="#4F46E5" stroke-width="1"
+                                                            stroke-linecap="round" />
                                                     </svg>
                                                 @endif
                                                 <div class="grid gap-1">
                                                     <h4 class="text-gray-900 text-sm font-normal leading-snug">
-                                                        {{ $uploadedFiles[$upload_id]->getClientOriginalName() }}</h4>
-                                                    <h5 class="text-gray-400   text-xs font-normal leading-[18px]">Upload
-                                                        complete</h5>
+                                                        {{ (isset($uploadedFiles[$upload_id]) ? $uploadedFiles[$upload_id]->getClientOriginalName() : (isset($existingUploads[$upload_id]) ? $existingUploads[$upload_id]->getClientOriginalName() : 'Nama File Tidak Ada')) }}</h4>
+                                                    <h5 id="text-size-error-{{ $upload_id }}"
+                                                        class="text-gray-400 text-xs font-normal leading-[18px]">
+                                                        Upload complete</h5>
                                                 </div>
                                             </div>
 
                                         </div>
-
-                                        {{-- <div class="relative flex items-center gap-2.5 py-1.5">
-                                            <div class="relative  w-full h-2.5  overflow-hidden rounded-3xl bg-gray-100">
-                                                <div role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"
-                                                    style="width: 100%"
-                                                    class="flex h-full items-center justify-center bg-indigo-600  text-white rounded-3xl">
-                                                </div>
-                                            </div>
-                                            <span
-                                                class="ml-2 bg-white  rounded-full  text-gray-800 text-xs font-medium flex justify-center items-center ">100%</span>
-                                        </div> --}}
                                     </div>
                                 @else
                                     <div></div>
                                 @endif
 
-                                @error('uploadedFiles.' . $upload->id)
+                                {{-- @error('uploadedFiles.' . $upload->id) --}}
+                                @error('existingUploads.' . $upload->id)
                                     <p class="text-red-500">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -476,17 +542,52 @@
                 </div>
             </div>
         @endif
+        {{-- @script --}}
+        <script>
+            function validateFileSize(input, id) {
+                const MAX_SIZE_MB = 5;
+                const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+                // const errorElement = document.getElementById(`size-error-${id}`);
+                // const uploadSuccess = document.getElementById(`upload-success-${id}`);
+                var errorDiv = document.getElementById(`size-error-${id}`);
+                var errorDexscription = document.getElementById(`text-size-error-${id}`);
+                var errorDexscription1 = document.getElementById(`text-size-error1-${id}`);
+                console.log('file.size');
 
+                if (input.files.length > 0) {
+                    var file = input.files[0];
+                    var fileSizeMB = (file.size / 1024 / 1024).toFixed(2); // Format angka            
+                    if (file.size > MAX_SIZE_BYTES) {
+                        // errorDescription.textContent = `Ukuran file ini ${fileSizeMB}MB.`;            
+                        errorDexscription1.textContent = 'Ukuran file ini ' + fileSizeMB + 'MB.';
+                        errorDescription.textContent = 'Ukuran file ini ' + fileSizeMB + 'MB.';
+                        errorDiv.classList.remove('hidden');
+                        // uploadSuccess.classList.add('hidden');
+                    } else {
+                        errorDexscription1.textContent = ''; // Kosongkan pesan error
+                        errorDescription.textContent = ''; // Kosongkan pesan error
+                        errorDiv.classList.add('hidden');
+                    }
+                } else {
+                    errorDexscription1.textContent = '';
+                    errorDescription.textContent = '';
+                    errorDiv.classList.add('hidden');
+                }
+            }
+        </script>
+        {{-- @endscript --}}
         <!-- Konfirmasi -->
         @if ($currentStep === 5)
             <div class="p-4 rounded-lg shadow-md mt-5 bg-white space-y-6">
                 <h3 class="text-lg font-semibold text-center">Konfirmasi</h3>
                 <div class="max-w-xl mx-auto text-center">
-                    <p class="text-gray-700">Silahkan periksa kembali data yang Anda isi sebelum mengirim permohonan.
+                    {{-- <p class="text-gray-700">Silahkan periksa kembali data yang Anda isi sebelum mengirim permohonan. --}}
                     </p>
-                    <p class="text-gray-700">Jika semua data sudah benar, silahkan klik tombol <strong>Submit</strong>
+                    <p class="text-gray-700">Pasikan semua data sudah terisi dengan benar, silakan klik tombol
+                        <strong>Submit</strong>
                         di bawah untuk mengirim
-                        permohonan.</p>
+                        permohonan.
+                    </p>
                 </div>
             </div>
         @endif

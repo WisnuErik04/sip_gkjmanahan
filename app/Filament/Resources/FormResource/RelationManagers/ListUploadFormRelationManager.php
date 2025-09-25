@@ -41,6 +41,7 @@ class ListUploadFormRelationManager extends RelationManager
                             ->options([
                                 'image' => 'Gambar',
                                 'pdf'    => 'PDF',
+                                'both'    => 'Gambar & PDF',
                             ])
                             ->reactive()
                             ->required(),
@@ -73,7 +74,13 @@ class ListUploadFormRelationManager extends RelationManager
                     ->color(fn (string $state): string => match ($state) {
                         'image' => 'warning',
                         'pdf' => 'success',
+                        'both' => 'info',
                     })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+        'image' => 'Gambar',
+        'pdf' => 'Dokumen PDF',
+        'both' => 'Gambar & PDF',
+    })
                     ->sortable(),
                 ToggleColumn::make('is_required')
                     ->label('Wajib?') ,

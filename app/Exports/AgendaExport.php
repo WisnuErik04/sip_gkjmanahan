@@ -24,7 +24,9 @@ class AgendaExport implements FromView
         // return view('exports.agenda_details', compact('agenda', 'records'));
         return view('exports.agenda_details', [
             'agenda' => $this->agenda,
-            'records' => $this->agenda->agendaDetails->groupBy('agendaJenis.name'),
+            'records' => $this->agenda->agendaDetails->sortBy(function ($agendaDetail) { // Di sini $agendaDetail muncul
+                return optional($agendaDetail->agendaJenis)->id;
+            })->groupBy('agendaJenis.name'),
         ]);
     }
 }

@@ -11,6 +11,6 @@ class AgendaJenis extends Model
 
     public function agendaDetails(): HasMany
     {
-        return $this->hasMany(AgendaDetail::class, 'jenis_id');
+        return $this->hasMany(AgendaDetail::class, 'jenis_id')->orderBy('id', 'asc');
     }
 }

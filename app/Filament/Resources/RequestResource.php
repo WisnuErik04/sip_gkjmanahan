@@ -278,7 +278,7 @@ class RequestResource extends Resource
                         'Pengajuan' => 'gray',
                         'Diproses'  => 'warning',
                         'Disetujui' => 'success',
-                        'Ditolak'   => 'danger',
+                        'Tidak Disetujui'   => 'danger',
                         'Agenda'   => 'info',
                         default     => 'secondary',
                     })
@@ -286,7 +286,7 @@ class RequestResource extends Resource
                         'Pengajuan' => 'heroicon-o-clock',
                         'Diproses'  => 'heroicon-o-arrow-path',
                         'Disetujui' => 'heroicon-o-check-circle',
-                        'Ditolak'   => 'heroicon-o-x-circle',
+                        'Tidak Disetujui'   => 'heroicon-o-x-circle',
                         default     => 'heroicon-o-question-mark-circle',
                     }),
                 Tables\Columns\TextColumn::make('created_at')

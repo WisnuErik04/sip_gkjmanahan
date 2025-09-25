@@ -14,8 +14,7 @@
                             <div class="max-w-2xl mx-auto text-center mb-20">
                                 <h1 class="font-heading text-5xl sm:text-6xl tracking-xs text-white mb-6">Berhasil</h1>
                                 <p class="text-lg text-white opacity-80">Form Berhasil Diajukan!</p>
-                                <p class="text-lg text-white opacity-80">Silakan cek email Anda untuk melihat status
-                                    pengajuan secara berkala.</p>
+                                <p class="text-lg text-white opacity-80">Anda akan mendapatkan notifikasi WA untuk melihat status pengajuan secara berkala.</p>
                             </div>
                             <a class="inline-flex py-4 px-6 items-center justify-center text-lg font-medium text-teal-900 border border-lime-500 hover:border-white bg-lime-500 hover:bg-white rounded-full transition duration-200"
                                 href="{{ route('home') }}">
