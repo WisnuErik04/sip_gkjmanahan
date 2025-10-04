@@ -166,6 +166,16 @@ class FormPermohonan extends Component
         // };
     }
 
+    //  public function goToStep($stepTarget)
+    // {
+    //     // dd('asasasas');
+    //     // Logika untuk validasi
+    //     // Misalnya, pastikan langkah yang diklik sudah diisi sebelumnya
+    //     if ($stepTarget < $this->step) {
+    //         $this->step = $stepTarget;
+    //     }
+    // }
+
     public function updateProgress($event, $percentage)
     {
         // dd($event);

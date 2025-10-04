@@ -15,7 +15,7 @@ class RequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_request');
+        return $user->can('view_any_verification');
     }
 
     /**
@@ -23,7 +23,7 @@ class RequestPolicy
      */
     public function view(User $user, Request $request): bool
     {
-        return $user->can('view_request');
+        return $user->can('view_verification');
     }
 
     /**
@@ -31,7 +31,7 @@ class RequestPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_request');
+        return $user->can('create_verification');
     }
 
     /**
@@ -39,7 +39,7 @@ class RequestPolicy
      */
     public function update(User $user, Request $request): bool
     {
-        return $user->can('update_request');
+        return $user->can('update_verification');
     }
 
     /**
@@ -47,7 +47,7 @@ class RequestPolicy
      */
     public function delete(User $user, Request $request): bool
     {
-        return $user->can('delete_request');
+        return $user->can('delete_verification');
     }
 
     /**
@@ -55,7 +55,7 @@ class RequestPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_request');
+        return $user->can('delete_any_verification');
     }
 
     /**
@@ -63,7 +63,7 @@ class RequestPolicy
      */
     public function forceDelete(User $user, Request $request): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_verification');
     }
 
     /**
@@ -71,7 +71,7 @@ class RequestPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_verification');
     }
 
     /**
@@ -79,7 +79,7 @@ class RequestPolicy
      */
     public function restore(User $user, Request $request): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_verification');
     }
 
     /**
@@ -87,7 +87,7 @@ class RequestPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_verification');
     }
 
     /**
@@ -95,7 +95,7 @@ class RequestPolicy
      */
     public function replicate(User $user, Request $request): bool
     {
-        return $user->can('{{ Replicate }}');
+        return $user->can('replicate_verification');
     }
 
     /**
@@ -103,6 +103,6 @@ class RequestPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('reorder_verification');
     }
 }

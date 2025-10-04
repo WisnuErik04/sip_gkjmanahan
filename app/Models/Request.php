@@ -48,10 +48,10 @@ class Request extends Model
         return $this->belongsTo(Form::class);
     }
 
-    // public function uploadFile(): HasMany
-    // {
-    //     return $this->hasMany(UploadFile::class, 'request_id');
-    // }
+    public function uploadFile(): HasMany
+    {
+        return $this->hasMany(UploadFile::class, 'request_id');
+    }
 
     // public function files(): HasMany
     // {

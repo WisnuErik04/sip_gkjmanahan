@@ -37,23 +37,60 @@ class UserResource extends Resource
                 // Forms\Components\DateTimePicker::make('email_verified_at'),
                 
             ];
-            $user_id = auth()->user()->id;
-            $schema[] = Forms\Components\TextInput::make('password')
-                        ->password()
-                        ->maxLength(255)
-                        ->required(fn ($livewire) => $livewire->record->id == $user_id)
-                        ->hidden(fn ($livewire) => $livewire->record->id != $user_id); // Sembunyikan jika user sedang mengedit dirinya sendiri
+            // $user_id = auth()->user()->id ?? 'xxx';
+            // $schema[] = Forms\Components\TextInput::make('password')
+            //             ->password()
+            //             ->maxLength(255)
+            //             ->revealable()
+            //             ->required(fn ($livewire) => $livewire->record->id == $user_id)
+            //             ->hidden(fn ($livewire) => $livewire->record->id != $user_id); // Sembunyikan jika user sedang mengedit dirinya sendiri
 
-            $role_id = auth()->user()->role_id;
-            $verifikator = Role::where('id', $role_id)->first();
-            if ($verifikator->name != 'Admin Sekretariat') {
-                $schema[] = Forms\Components\Select::make('role_id')
-                    ->required()
-                    ->relationship('role', 'name')
-                    ->searchable()
-                    ->preload();
-            }
+            // $role_id = auth()->user()->role_id;
+            // $verifikator = Role::where('id', $role_id)->first();
+            // if ($verifikator->name != 'Admin Sekretariat') {
+            //     $schema[] = Forms\Components\Select::make('role_id')
+            //         ->required()
+            //         ->relationship('role', 'name')
+            //         ->searchable()
+            //         ->preload();
+            // }
         
+                $current_user_id = auth()->id();
+             $schema[] = Forms\Components\TextInput::make('password')
+        ->password()
+        ->maxLength(255)
+        ->revealable()
+        // ->dehydrateStateUsing(fn (string $state): string => Hash::make($state)) // Hash password saat disimpan
+            ->dehydrated(fn (?string $state): bool => filled($state)) // Hanya simpan jika diisi
+        ->required(fn ($livewire, string $operation): bool => 
+            // Wajib diisi saat membuat record BARU
+            $operation === 'create' 
+            // || 
+            // Wajib diisi saat mengedit diri sendiri DAN ada password baru yang diketik
+            // ($livewire->record->id == $current_user_id && $operation === 'edit')
+        )
+        // Sembunyikan field password saat Admin mengedit user lain (Bukan diri sendiri)
+        ->hidden(fn ($livewire, string $operation) => 
+            $operation === 'edit' && $livewire->record && $livewire->record->id !== $current_user_id
+        )
+        // Jika sedang Edit diri sendiri, beri label yang jelas
+        ->label(fn ($livewire, string $operation) => 
+            ($operation === 'edit' && $livewire->record->id == $current_user_id) ? 'Password Baru (Isi jika ingin diubah)' : 'Password'
+        );
+
+    // Logika Role ID (Pastikan Role::where() diimpor)
+    if ($current_user_id) { // Cek apakah ada user yang login
+        $verifikator = optional(auth()->user()->role)->name; // Ambil nama role dengan aman
+        
+        // Asumsi: Role Admin Sekretariat tidak boleh mengubah Role orang lain
+        if ($verifikator != 'Admin Sekretariat') {
+             $schema[] = Forms\Components\Select::make('role_id')
+                ->required()
+                ->relationship('role', 'name')
+                ->searchable()
+                ->preload();
+        }
+    }
             return $form->schema($schema);
     }
 

@@ -17,14 +17,17 @@
             <div class=" px-4 max-w-2xl mx-auto space-y-6">
                 <div class="flex justify-between items-center mb-6">
                     @foreach ([1 => 'Pemohon', 2 => 'Permohonan', 3 => 'Pengisian', 4 => 'Unggah Dokumen', 5 => 'Konfirmasi'] as $index => $label)
-                        <div
-                            class="px-4 flex flex-col items-center text-sm {{ $currentStep === $index ? 'text-white font-bold' : 'text-white' }}">
-                            <div
-                                class="w-8 h-8 rounded-full border-2 flex items-center justify-center {{ $currentStep >= $index ? 'border-white' : 'border-white' }}">
-                                {{ $index }}
+                        {{-- <button type="button" class=" {{ $currentStep > $index ? 'cursor-pointer' : '' }}"
+                            wire:click="{{ $currentStep > $index ? 'goToStep(' . $index . ')' : '' }}"> --}}
+                            <div class="px-4 flex flex-col items-center text-sm {{ $currentStep === $index ? 'text-white font-bold' : 'text-white' }}">
+                                <div
+                                    class="w-8 h-8 rounded-full border-2 flex items-center justify-center {{ $currentStep >= $index ? 'border-white' : 'border-white' }}">
+                                    {{ $index }}
+                                </div>
+                                <span class="mt-1">{{ $label }}</span>
+
                             </div>
-                            <span class="mt-1">{{ $label }}</span>
-                        </div>
+                        {{-- </button> --}}
                     @endforeach
                 </div>
             </div>
@@ -432,10 +435,8 @@
                                     @endif
                                 </label>
 
-                                <x-filepond::upload class="filepond" 
-                                    wire:model="uploadedFiles.{{ $upload->id }}"
-                                    :existing-files="null"
-                                    {{-- acceptedFileTypes="{{ $upload->upload_type === 'pdf' ? 'application/pdf' : 'image/*' }}" --}}
+                                <x-filepond::upload class="filepond" wire:model="uploadedFiles.{{ $upload->id }}"
+                                    :existing-files="null" {{-- acceptedFileTypes="{{ $upload->upload_type === 'pdf' ? 'application/pdf' : 'image/*' }}" --}}
                                     acceptedFileTypes="{{ $upload->upload_type === 'pdf' ? 'application/pdf' : ($upload->upload_type === 'both' ? 'application/pdf,image/*' : 'image/*') }}"
                                     max-file-size="5MB" />
 
@@ -443,7 +444,7 @@
                                     $upload_id = $upload->id;
                                 @endphp
 
-                              
+
                                 {{-- <input type="file" wire:model="uploadedFiles.{{ $upload_id }}"
                                     onchange="validateFileSize(this, {{ $upload_id }})"
                                     class="block w-full border border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
@@ -452,7 +453,9 @@
 
 
                                 <p class="text-xs text-gray-500">
-                                    Format: {{ $upload->upload_type === 'pdf' ? 'PDF' : ($upload->upload_type === 'both' ? 'PDF, JPG, JPEG, PNG' : 'JPG, JPEG, PNG') }}, Maks:
+                                    Format:
+                                    {{ $upload->upload_type === 'pdf' ? 'PDF' : ($upload->upload_type === 'both' ? 'PDF, JPG, JPEG, PNG' : 'JPG, JPEG, PNG') }},
+                                    Maks:
                                     5MB
                                 </p>
                                 <p id="size-error-{{ $upload_id }}" class="text-sm text-red-600 mt-1"></p>
@@ -519,7 +522,8 @@
                                                 @endif
                                                 <div class="grid gap-1">
                                                     <h4 class="text-gray-900 text-sm font-normal leading-snug">
-                                                        {{ (isset($uploadedFiles[$upload_id]) ? $uploadedFiles[$upload_id]->getClientOriginalName() : (isset($existingUploads[$upload_id]) ? $existingUploads[$upload_id]->getClientOriginalName() : 'Nama File Tidak Ada')) }}</h4>
+                                                        {{ isset($uploadedFiles[$upload_id]) ? $uploadedFiles[$upload_id]->getClientOriginalName() : (isset($existingUploads[$upload_id]) ? $existingUploads[$upload_id]->getClientOriginalName() : 'Nama File Tidak Ada') }}
+                                                    </h4>
                                                     <h5 id="text-size-error-{{ $upload_id }}"
                                                         class="text-gray-400 text-xs font-normal leading-[18px]">
                                                         Upload complete</h5>
