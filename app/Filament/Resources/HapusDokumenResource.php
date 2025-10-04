@@ -42,7 +42,7 @@ class HapusDokumenResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document';
     protected static ?string $navigationGroup = 'Form Permohonan';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
